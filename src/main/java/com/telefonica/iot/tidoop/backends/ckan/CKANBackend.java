@@ -81,24 +81,30 @@ public class CKANBackend {
      */
     public List<String> getPackages(String orgId) {
         logger.debug("Getting the packages within " + orgId + " organization");
+        List<String> pkgNames = new ArrayList<String>();
 
         try {
-            List<String> resIds = new ArrayList<String>();
             String url = "http" + (ssl ? "s" : "") + "://" + ckanHost + ":" + ckanPort
                     + "/api/3/action/organization_show?id=" + orgId;
             CKANResponse resp = doCKANRequest("GET", url, "");
             JSONObject result = (JSONObject) resp.getJsonObject().get("result");
             JSONArray pkgs = (JSONArray) result.get("packages");
             
+            if (pkgs == null || pkgs.size() == 0) {
+                logger.debug("No packages got from organization " + orgId);
+                return pkgNames;
+            } // if
+            
             for (Object pkg1 : pkgs) {
                 JSONObject pkg = (JSONObject) pkg1;
-                resIds.add((String) pkg.get("id"));
+                pkgNames.add((String) pkg.get("id"));
             } // for
             
-            return resIds;
+            return pkgNames;
         } catch (Exception e) {
-            return null;
-        } // try catch
+            logger.debug("An exception occured, returning partial package list. Details = " + e.getMessage());
+            return pkgNames;
+        } // try catch // try catch
     } // getPackages
     
     /**
@@ -108,14 +114,19 @@ public class CKANBackend {
      */
     public List<String> getResources(String pkgId) {
         logger.debug("Getting the resources within " + pkgId + " + package");
+        List<String> resIds = new ArrayList<String>();
         
         try {
-            List<String> resIds = new ArrayList<String>();
             String url = "http" + (ssl ? "s" : "") + "://" + ckanHost + ":" + ckanPort
                     + "/api/3/action/package_show?id=" + pkgId;
             CKANResponse resp = doCKANRequest("GET", url, "");
             JSONObject result = (JSONObject) resp.getJsonObject().get("result");
             JSONArray resources = (JSONArray) result.get("resources");
+            
+            if (resources == null || resources.size() == 0) {
+                logger.debug("No resources got from package " + pkgId);
+                return resIds;
+            } // if
             
             for (Object res : resources) {
                 JSONObject resource = (JSONObject) res;
@@ -124,7 +135,8 @@ public class CKANBackend {
             
             return resIds;
         } catch (Exception e) {
-            return null;
+            logger.debug("An exception occured, returning partial resource list. Details=" + e.getMessage());
+            return resIds;
         } // try catch
     } // getResources
     
@@ -147,7 +159,8 @@ public class CKANBackend {
                 JSONObject result = (JSONObject) resp.getJsonObject().get("result");
                 JSONArray records = (JSONArray) result.get("records");
                 
-                if (records.size() == 0) {
+                if (records == null || records.size() == 0) {
+                    logger.debug("No records got from resource " + resId);
                     break;
                 } // if
                 
@@ -157,6 +170,7 @@ public class CKANBackend {
             
             return numRecords;
         } catch (Exception e) {
+            logger.debug("An exception occured, returning 0 records. Details=" + e.getMessage());
             return 0;
         } // try catch
     } // resURL
@@ -178,7 +192,8 @@ public class CKANBackend {
             JSONObject result = (JSONObject) resp.getJsonObject().get("result");
             return (JSONArray) result.get("records");
         } catch (Exception e) {
-            return null;
+            logger.debug("An exception occured, returning empty list of records. Details=" + e.getMessage());
+            return new JSONArray();
         } // try catch
     } // getRecords
     
