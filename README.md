@@ -145,7 +145,7 @@ Tests run: 24, Failures: 0, Errors: 0, Skipped: 0
 
 **Disclaimer:** If you are reading this section then you should be familiar with CKAN concepts and hierarchies. However, as a quick reminder, it will be said that CKAN organizes the data into <i>organizations</i>, having each organization a set of <i>packages</i> or <i>datasets</i>, having each package/organization a set of <i>resources</i>. Finally, each resource has a list of data records.
 
-A good way to learn about CKAN extensions is to have a look to the testing purpose MapReduce application distributed with Tidoop. This can be found at `src/main/java/com/telefonica/iot/tidoop/utils/CKANMapReduceExample.java`. This application is in charge of counting the number of bytes among all the configured innputs.
+A good way to learn about CKAN extensions is to have a look to the testing purpose MapReduce application distributed with Tidoop. This can be found at `src/main/java/com/telefonica/iot/tidoop/utils/CKANMapReduceExample.java`. This application is in charge of counting the number of bytes among all the configured inputs.
 
 Map an Reduce classes are the following ones, they are very simple:
 
