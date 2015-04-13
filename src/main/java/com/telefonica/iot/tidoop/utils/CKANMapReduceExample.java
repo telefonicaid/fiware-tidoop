@@ -20,16 +20,15 @@
 package com.telefonica.iot.tidoop.utils;
 
 import com.telefonica.iot.tidoop.hadoop.ckan.CKANInputFormat;
+import com.telefonica.iot.tidoop.hadoop.ckan.CKANOutputFormat;
 import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
@@ -109,7 +108,7 @@ public final class CKANMapReduceExample extends Configured implements Tool {
         boolean sslEnabled = args[2].equals("true");
         String ckanAPIKey = args[3];
         String ckanInputs = args[4];
-        String hdfsOutput = args[5];
+        String ckanOutput = args[5];
         String splitsLength = args[6];
         
         // create and configure a MapReduce job
@@ -125,7 +124,9 @@ public final class CKANMapReduceExample extends Configured implements Tool {
         CKANInputFormat.addCKANInput(job, ckanInputs);
         CKANInputFormat.setCKANEnvironmnet(job, ckanHost, ckanPort, sslEnabled, ckanAPIKey);
         CKANInputFormat.setCKANSplitsLength(job, splitsLength);
-        FileOutputFormat.setOutputPath(job, new Path(hdfsOutput));
+        job.setOutputFormatClass(CKANOutputFormat.class);
+        CKANOutputFormat.setEnvironmnet(job, ckanHost, ckanPort, sslEnabled, ckanAPIKey);
+        CKANOutputFormat.setOutputPkg(job, ckanOutput);
         
         // run the MapReduce job
         return job.waitForCompletion(true) ? 0 : 1;
