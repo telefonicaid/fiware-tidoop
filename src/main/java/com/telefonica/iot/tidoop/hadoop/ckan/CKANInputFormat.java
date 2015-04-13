@@ -20,6 +20,12 @@
 package com.telefonica.iot.tidoop.hadoop.ckan;
 
 import com.telefonica.iot.tidoop.backends.ckan.CKANBackend;
+import static com.telefonica.iot.tidoop.utils.Constants.INPUT_CKAN_API_KEY;
+import static com.telefonica.iot.tidoop.utils.Constants.INPUT_CKAN_HOST;
+import static com.telefonica.iot.tidoop.utils.Constants.INPUT_CKAN_PORT;
+import static com.telefonica.iot.tidoop.utils.Constants.INPUT_CKAN_SPLITS_LENGTH;
+import static com.telefonica.iot.tidoop.utils.Constants.INPUT_CKAN_SSL;
+import static com.telefonica.iot.tidoop.utils.Constants.INPUT_CKAN_URLS;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.hadoop.classification.InterfaceAudience;
@@ -46,12 +52,6 @@ import org.apache.log4j.Logger;
 public class CKANInputFormat extends InputFormat<LongWritable, Text> {
     
     private final Logger logger;
-    public static final String CKAN_HOST = "mapreduce.input.ckaninputformat.host";
-    public static final String CKAN_PORT = "mapreduce.input.ckaninputformat.port";
-    public static final String CKAN_SSL = "mapreduce.input.ckaninputformat.ssl";
-    public static final String CKAN_API_KEY = "mapreduce.input.ckaninputformat.apikey";
-    public static final String INPUT_URLS = "mapreduce.input.ckaninputformat.inputurls";
-    public static final String CKAN_SPLITS_LENGTH = "mapreduce.input.ckaninputformat.splitslength";
     private CKANBackend backend;
 
     /**
@@ -71,10 +71,10 @@ public class CKANInputFormat extends InputFormat<LongWritable, Text> {
      * @param ckanAPIKey
      */
     public static void setCKANEnvironmnet(Job job, String ckanHost, String ckanPort, boolean ssl, String ckanAPIKey) {
-        job.getConfiguration().set(CKAN_HOST, ckanHost);
-        job.getConfiguration().set(CKAN_PORT, ckanPort);
-        job.getConfiguration().set(CKAN_SSL, ssl ? "true" : "false");
-        job.getConfiguration().set(CKAN_API_KEY, ckanAPIKey);
+        job.getConfiguration().set(INPUT_CKAN_HOST, ckanHost);
+        job.getConfiguration().set(INPUT_CKAN_PORT, ckanPort);
+        job.getConfiguration().set(INPUT_CKAN_SSL, ssl ? "true" : "false");
+        job.getConfiguration().set(INPUT_CKAN_API_KEY, ckanAPIKey);
     } // setCKANAPIKey
     
     /**
@@ -92,7 +92,7 @@ public class CKANInputFormat extends InputFormat<LongWritable, Text> {
      */
     public static void addCKANInput(Job job, String ckanURL) {
         Configuration conf = job.getConfiguration();
-        String inputs = conf.get(INPUT_URLS, "");
+        String inputs = conf.get(INPUT_CKAN_URLS, "");
         
         if (inputs.isEmpty()) {
             inputs += ckanURL;
@@ -100,7 +100,7 @@ public class CKANInputFormat extends InputFormat<LongWritable, Text> {
             inputs += "," + ckanURL;
         } // if else
         
-        conf.set(INPUT_URLS, inputs);
+        conf.set(INPUT_CKAN_URLS, inputs);
     } // addCKANInput
     
     /**
@@ -109,33 +109,36 @@ public class CKANInputFormat extends InputFormat<LongWritable, Text> {
      * @param length
      */
     public static void setCKANSplitsLength(Job job, String length) {
-        job.getConfiguration().set(CKAN_SPLITS_LENGTH, length);
+        job.getConfiguration().set(INPUT_CKAN_SPLITS_LENGTH, length);
     } // stCKANSplitsLength
 
     @Override
     public RecordReader<LongWritable, Text> createRecordReader(InputSplit split, TaskAttemptContext context) {
         // create a reader... it will need its own backend instace
-        String ckanHost = context.getConfiguration().get(CKAN_HOST);
-        String ckanPort = context.getConfiguration().get(CKAN_PORT);
-        boolean ckanSSL = context.getConfiguration().get(CKAN_SSL).equals("true");
-        String ckanAPIKey = context.getConfiguration().get(CKAN_API_KEY);
+        String ckanHost = context.getConfiguration().get(INPUT_CKAN_HOST);
+        String ckanPort = context.getConfiguration().get(INPUT_CKAN_PORT);
+        boolean ckanSSL = context.getConfiguration().get(INPUT_CKAN_SSL).equals("true");
+        String ckanAPIKey = context.getConfiguration().get(INPUT_CKAN_API_KEY);
+        int splitsLength = new Integer(context.getConfiguration().get(INPUT_CKAN_SPLITS_LENGTH));
         logger.info("Creating record reader, the backend is at " + (ckanSSL ? "https://" : "http://") + ckanHost + ":"
                 + ckanPort + " (API key=" + ckanAPIKey + ")");
-        return new CKANRecordReader(new CKANBackend(ckanHost, ckanPort, ckanSSL, ckanAPIKey), split, context);
+        return new CKANRecordReader(new CKANBackend(ckanHost, ckanPort, ckanSSL, ckanAPIKey, splitsLength),
+                split, context);
     } // createRecordReader
     
     @Override
     public List<InputSplit> getSplits(JobContext job) {
         // create a CKAN backend
-        String ckanHost = job.getConfiguration().get(CKAN_HOST);
-        String ckanPort = job.getConfiguration().get(CKAN_PORT);
-        boolean ckanSSL = job.getConfiguration().get(CKAN_SSL).equals("true");
-        String ckanAPIKey = job.getConfiguration().get(CKAN_API_KEY);
+        String ckanHost = job.getConfiguration().get(INPUT_CKAN_HOST);
+        String ckanPort = job.getConfiguration().get(INPUT_CKAN_PORT);
+        boolean ckanSSL = job.getConfiguration().get(INPUT_CKAN_SSL).equals("true");
+        String ckanAPIKey = job.getConfiguration().get(INPUT_CKAN_API_KEY);
+        int splitsLength = new Integer(job.getConfiguration().get(INPUT_CKAN_SPLITS_LENGTH));
         logger.info("Getting splits, the backend is at " + (ckanSSL ? "https://" : "http://") + ckanHost + ":"
                 + ckanPort + " (API key=" + ckanAPIKey + ")");
         
         if (backend == null) {
-            backend = new CKANBackend(ckanHost, ckanPort, ckanSSL, ckanAPIKey);
+            backend = new CKANBackend(ckanHost, ckanPort, ckanSSL, ckanAPIKey, splitsLength);
         } // if
         
         // resulting splits container
@@ -145,7 +148,7 @@ public class CKANInputFormat extends InputFormat<LongWritable, Text> {
         Configuration conf = job.getConfiguration();
         
         // get the inputs, i.e. the list of CKAN URLs
-        String input = conf.get(INPUT_URLS, "");
+        String input = conf.get(INPUT_CKAN_URLS, "");
         String[] ckanURLs = StringUtils.split(input);
         
         // iterate on the CKAN URLs, they may be related to whole organizations, packages/datasets or specific resources
@@ -247,7 +250,7 @@ public class CKANInputFormat extends InputFormat<LongWritable, Text> {
             return splits;
         } // if
         
-        int splitsLength = new Integer(conf.get(CKAN_SPLITS_LENGTH));
+        int splitsLength = new Integer(conf.get(INPUT_CKAN_SPLITS_LENGTH));
         int numCompleteBlocks = numRecords / splitsLength;
         int i;
         

@@ -31,8 +31,21 @@ public final class Constants {
     private Constants() {
     } // Constants
 
+    // HTTP constants
     public static final int MAX_CONNS = 500;
     public static final int MAX_CONNS_PER_ROUTE = 100;
-    public static final int MAX_NAME_LEN = 64;
+
+    // MapReduce constants
+    public static final String INPUT_CKAN_HOST = "mapreduce.input.ckaninputformat.host";
+    public static final String INPUT_CKAN_PORT = "mapreduce.input.ckaninputformat.port";
+    public static final String INPUT_CKAN_SSL = "mapreduce.input.ckaninputformat.ssl";
+    public static final String INPUT_CKAN_API_KEY = "mapreduce.input.ckaninputformat.apikey";
+    public static final String INPUT_CKAN_URLS = "mapreduce.input.ckaninputformat.inputurls";
+    public static final String INPUT_CKAN_SPLITS_LENGTH = "mapreduce.input.ckaninputformat.splitslength";
+    public static final String OUTPUT_CKAN_HOST = "mapreduce.output.ckanoutputformat.host";
+    public static final String OUTPUT_CKAN_PORT = "mapreduce.output.ckanoutputformat.port";
+    public static final String OUTPUT_CKAN_SSL = "mapreduce.output.ckanoutputformat.ssl";
+    public static final String OUTPUT_CKAN_API_KEY = "mapreduce.output.ckanoutputformat.apikey";
+    public static final String OUTPUT_CKAN_URL = "mapreduce.output.ckanoutputformat.outputurl";
 
 } // Constants
