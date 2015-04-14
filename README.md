@@ -310,7 +310,7 @@ The application can be run as:
         <ckan output package> \
         <splits length>
         
-An example of run:
+An example of run (using a fake CKAN API key "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"):
 
 ```
 $ hadoop jar /home/user1/fiware-tidoop/target/tidoop-0.0.0_SNAPSHOT-jar-with-dependencies.jar com.telefonica.iot.tidoop.utils.CKANMapReduceExample -libjars /home/user1/fiware-tidoop/target/tidoop-0.0.0_SNAPSHOT-jar-with-dependencies.jar data.lab.fiware.org 443 true xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx https://data.lab.fiware.org/dataset/logrono_cygnus/resource/ca73a799-9c71-4618-806e-7bd0ca1911f4 https://data.lab.fiware.org/dataset/logrono_cygnus 1000
@@ -423,7 +423,7 @@ As can be seen, the total size is computed and added as a (key, value) pair in a
 
 ####<a name="section3.1.5"></a>CKAN extensions in a hybrid scenario
 
-As can be imagined, not always a pure CKAN scenario is considered, i.e. not always the input data is stored in CKAN and the resulting output is intended to be stored at CKAN. Some times, the input is stored in HDFS or any other storage, but the output is written in CKAN; or viceversa, the input data comes from CKAN but the MapReduce result is wanted to be put into HDFS. In those cases, simply use `CKANInputFormat` or `CKANOutputFormat` depending on your scenario in combination with other `OutputFormat` or other `InputFormat`, respectively.
+As can be imagined, not always a pure CKAN scenario is considered, i.e. not always the input data is stored in CKAN and the resulting output is intended to be stored at CKAN as well. Some times, the input is stored in HDFS or any other storage, but the output is written in CKAN; or viceversa, the input data comes from CKAN and the MapReduce result is wanted to be put into HDFS. In those cases, simply use `CKANInputFormat` or `CKANOutputFormat` depending on your scenario in combination with other `OutputFormat` or other `InputFormat`, respectively.
 
 [Top](#section0)
 
@@ -435,5 +435,7 @@ To be released.
 
 ##<a name="section4"></a>Contact
 Francisco Romero Bueno (francisco dot romerobueno at telefonica dot com)
+<br>
+German Toro del Valle (german dot torodelvalle at telefonica dot com)
 
 [Top](#section0)

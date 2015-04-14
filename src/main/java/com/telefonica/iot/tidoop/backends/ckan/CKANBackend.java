@@ -279,7 +279,7 @@ public class CKANBackend {
     } // createKeyValueDatastore
     
     /**
-     * Inserts a (key, value) pair into a givern resource.
+     * Inserts a (key, value) pair into a given resource.
      * @param resId
      * @param key
      * @param value

@@ -144,7 +144,7 @@ public final class CKANMapReduceExample extends Configured implements Tool {
         System.out.println("   <ssl enabled=true|false> \\");
         System.out.println("   <ckan API key> \\");
         System.out.println("   <comma-separated list of ckan inputs> \\");
-        System.out.println("   <hdfs output folder> \\");
+        System.out.println("   <ckan output package> \\");
         System.out.println("   <splits length>");
     } // showUsage
     
