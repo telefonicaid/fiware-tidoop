@@ -39,6 +39,7 @@ public class CKANBackendTest {
     private final boolean enableSSL = false;
     private final String ckanAPIKey = "ckan_api_key_example";
     private final String orgId = "org_id_example";
+    private final int splitsLength = 50;
     
     /**
      * Sets up tests by creating a unique instance of the tested class, and by defining the behaviour of the mocked
@@ -49,7 +50,7 @@ public class CKANBackendTest {
     @Before
     public void setUp() throws Exception {
         // set up the instance of the tested class
-        ckanBackend = new CKANBackend(ckanHost, ckanPort, enableSSL, ckanAPIKey);
+        ckanBackend = new CKANBackend(ckanHost, ckanPort, enableSSL, ckanAPIKey, splitsLength);
     } // setUp
     
     /**
@@ -85,6 +86,30 @@ public class CKANBackendTest {
     } // testGetRecords
     
     /**
+     * Test of createResurce method, of class CKANBackend.
+     */
+    @Test
+    public void testCreateResurce() {
+        System.out.println("Testing CKANBackend.createResource");
+    } // testCreateResurce
+    
+    /**
+     * Test of createKeyValueDatastore method, of class CKANBackend.
+     */
+    @Test
+    public void testCreateKeyValueDatastore() {
+        System.out.println("Testing CKANBackend.createKeyValueDatastore");
+    } // testCreateKeyValueDatastore
+    
+    /**
+     * Test of insertKeyValue method, of class CKANBackend.
+     */
+    @Test
+    public void testInsertKeyValue() {
+        System.out.println("Testing CKANBackend.insertKeyValue");
+    } // testInsertKeyValue
+    
+    /**
      * Test of doCKANRequest method, of class CKANBackend.
      */
     @Test
@@ -93,7 +118,5 @@ public class CKANBackendTest {
         
         System.out.println("Testing CKANBackend.doCKANRequest (with payload)");
     } // testDoCKANRequest
-    
-    
     
 } // CKANBackendTest

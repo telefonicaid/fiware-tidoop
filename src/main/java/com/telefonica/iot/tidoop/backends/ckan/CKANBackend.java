@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -48,6 +50,7 @@ public class CKANBackend {
     private final String ckanPort;
     private final String apiKey;
     private final boolean ssl;
+    private final int splitsLength;
     private HttpClientFactory httpClientFactory;
     
     /**
@@ -56,15 +59,23 @@ public class CKANBackend {
      * @param ckanPort
      * @param ssl
      * @param apiKey
+     * @param splitsLength
      */
-    public CKANBackend(String ckanHost, String ckanPort, boolean ssl, String apiKey) {
+    public CKANBackend(String ckanHost, String ckanPort, boolean ssl, String apiKey, int splitsLength) {
         this.ckanHost = ckanHost;
         this.ckanPort = ckanPort;
         this.logger = Logger.getLogger(CKANBackend.class);
         this.apiKey = apiKey;
         this.ssl = ssl;
+        this.splitsLength = splitsLength;
         this.httpClientFactory = new HttpClientFactory(ssl);
     } // CKANBackend
+    
+    public String getHost() {return ckanHost;}
+    public String getPort() {return ckanPort;}
+    public boolean getSSL() {return ssl;}
+    public String getAPIKey() {return apiKey;}
+    public int getSplitsLength() {return splitsLength;}
     
     /**
      * Sets the Http client factory. It is protected since it is only going to be used by the tests.
@@ -154,7 +165,8 @@ public class CKANBackend {
             
             while (true) {
                 String url = "http" + (ssl ? "s" : "") + "://" + ckanHost + ":" + ckanPort
-                        + "/api/3/action/datastore_search?limit=1000&offset=" + (i * 1000) + "&resource_id=" + resId;
+                        + "/api/3/action/datastore_search?limit=" + splitsLength + "&offset=" + (i * splitsLength)
+                        + "&resource_id=" + resId;
                 CKANResponse resp = doCKANRequest("GET", url, "");
                 JSONObject result = (JSONObject) resp.getJsonObject().get("result");
                 JSONArray records = (JSONArray) result.get("records");
@@ -196,6 +208,110 @@ public class CKANBackend {
             return new JSONArray();
         } // try catch
     } // getRecords
+    
+    /**
+     * Creates a resource within a given package in CKAN.
+     * @param resName Resource to be created
+     * @param pkgId Package the resource belongs to
+     * @return A resource identifier if the resource was created or an exception if something went wrong
+     * @throws Exception
+     */
+    public String createResource(String resName, String pkgId) throws Exception {
+        try {
+            // create the CKAN request JSON
+            String jsonString = "{ \"name\": \"" + resName + "\", "
+                    + "\"url\": \"none\", "
+                    + "\"package_id\": \"" + pkgId + "\" }";
+            
+            // create the CKAN request URL
+            String urlPath = "http" + (ssl ? "s" : "") + "://" + ckanHost + ":" + ckanPort
+                    + "/api/3/action/resource_create";
+            
+            // do the CKAN request
+            CKANResponse res = doCKANRequest("POST", urlPath, jsonString);
+
+            // check the status
+            if (res.getStatusCode() == 200) {
+                String resId = ((JSONObject) res.getJsonObject().get("result")).get("id").toString();
+                logger.debug("Successful resource creation (resName/resId=" + resName + "/" + resId + ")");
+                return resId;
+            } else {
+                throw new Exception("Don't know how to treat the response code. Possibly the resource "
+                        + "already exists (respCode=" + res.getStatusCode() + ", resourceName=" + resName + ")");
+            } // if else if else
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        } // try catch
+    } // createResource
+    
+    /**
+     * Creates a datastore for a given resource in CKAN.
+     * @param resId Identifies the resource whose datastore is going to be created
+     * @throws Exception
+     */
+    public void createKeyValueDatastore(String resId) throws Exception {
+        try {
+            // create the CKAN request JSON
+            String jsonString = "{ \"resource_id\": \"" + resId
+                    + "\", \"fields\": [ "
+                    + "{ \"id\": \"key\", \"type\": \"text\"},"
+                    + "{ \"id\": \"value\", \"type\": \"int\"}"
+                    + "], "
+                    + "\"force\": \"true\" }";
+            
+            // create the CKAN request URL
+            String urlPath = "http" + (ssl ? "s" : "") + "://" + ckanHost + ":" + ckanPort
+                    + "/api/3/action/datastore_create";
+            
+            // do the CKAN request
+            CKANResponse res = doCKANRequest("POST", urlPath, jsonString);
+
+            // check the status
+            if (res.getStatusCode() == 200) {
+                logger.debug("Successful datastore creation (resourceId=" + resId + ")");
+            } else {
+                throw new Exception("Don't know how to treat the response code. Possibly the datastore "
+                        + "already exists (respCode=" + res.getStatusCode() + ", resourceId=" + resId + ")");
+            } // if else if else
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        } // try catch
+    } // createKeyValueDatastore
+    
+    /**
+     * Inserts a (key, value) pair into a given resource.
+     * @param resId
+     * @param key
+     * @param value
+     * @throws Exception
+     */
+    public void insertKeyValue(String resId, Text key, IntWritable value) throws Exception {
+        try {
+            // create the CKAN request JSON
+            String records = "\"key\": \"" + key + "\", "
+                    + "\"value\": \"" + value + "\"";
+            String jsonString = "{ \"resource_id\": \"" + resId
+                    + "\", \"records\": [ { " + records + " } ], "
+                    + "\"method\": \"insert\", "
+                    + "\"force\": \"true\" }";
+            
+            // create the CKAN request URL
+            String urlPath = "http" + (ssl ? "s" : "") + "://" + ckanHost + ":" + ckanPort
+                    + "/api/3/action/datastore_upsert";
+        
+            // do the CKAN request
+            CKANResponse res = doCKANRequest("POST", urlPath, jsonString);
+
+            // check the status
+            if (res.getStatusCode() == 200) {
+                logger.debug("Successful insert (resource/datastore id=" + resId + ")");
+            } else {
+                throw new Exception("Don't know how to treat response code " + res.getStatusCode());
+            } // if else
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        } // try catch
+    } // insert
     
     /**
      * Common method to perform HTTP requests using the CKAN API without payload.

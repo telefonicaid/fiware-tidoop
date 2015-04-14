@@ -2,12 +2,17 @@
 
 * [What is Tidoop](#section1)
 * [Building](#section2)
-  * [Prerequisites](#section2.1)
-  * [Building Tidoop and its dependencies](#section2.2)
-  * [Unit tests](#section2.3)
+    * [Prerequisites](#section2.1)
+    * [Building Tidoop and its dependencies](#section2.2)
+    * [Unit tests](#section2.3)
 * [Usage](#section3)
-  * [CKAN extensions](#section3.1)
-  * [NGSI extensions](#section3.2)
+    * [CKAN extensions](#section3.1)
+        * [Introducing `CKANMapReduceExample`](#section3.1.1)
+        * [`CKANInputFormat` and related classes](#section3.1.2)
+        * [`CKANOutputFormat` and related classes](#section3.1.3)
+        * [Running `CKANMapReduceExample`](#section3.1.4)
+        * [CKAN extensions in a hybrid scenario](#section3.1.5)
+    * [NGSI extensions](#section3.2)
 * [Contact](#section4)
 
 ##<a name="section1"></a>What is Tidoop
@@ -145,9 +150,13 @@ Tests run: 24, Failures: 0, Errors: 0, Skipped: 0
 
 **Disclaimer:** If you are reading this section then you should be familiar with CKAN concepts and hierarchies. However, as a quick reminder, it will be said that CKAN organizes the data into <i>organizations</i>, having each organization a set of <i>packages</i> or <i>datasets</i>, having each package/organization a set of <i>resources</i>. Finally, each resource has a list of data records.
 
+[Top](#section0)
+
+####<a name="section3.1.1"></a>Introducing `CKANMapReduceExample`
+
 A good way to learn about CKAN extensions is to have a look to the testing purpose MapReduce application distributed with Tidoop. This can be found at `src/main/java/com/telefonica/iot/tidoop/utils/CKANMapReduceExample.java`. This application is in charge of counting the number of bytes among all the configured inputs.
 
-Map an Reduce classes are the following ones, they are very simple:
+Map and Reduce classes are the following ones, they are very simple:
 
 ```
 /**
@@ -209,12 +218,12 @@ public int run(String[] args) throws Exception {
     boolean sslEnabled = args[2].equals("true");
     String ckanAPIKey = args[3];
     String ckanInputs = args[4];
-    String hdfsOutput = args[5];
+    String ckanOutput = args[5];
     String splitsLength = args[6];
         
     // create and configure a MapReduce job
     Configuration conf = this.getConf();
-    Job job = Job.getInstance(conf, "CKAN MapReduce example");
+    Job job = Job.getInstance(conf, "CKAN MapReduce test");
     job.setJarByClass(CKANMapReduceExample.class);
     job.setMapperClass(TokenizerMapper.class);
     job.setCombinerClass(IntSumReducer.class);
@@ -225,14 +234,25 @@ public int run(String[] args) throws Exception {
     CKANInputFormat.addCKANInput(job, ckanInputs);
     CKANInputFormat.setCKANEnvironmnet(job, ckanHost, ckanPort, sslEnabled, ckanAPIKey);
     CKANInputFormat.setCKANSplitsLength(job, splitsLength);
-    FileOutputFormat.setOutputPath(job, new Path(hdfsOutput));
+    job.setOutputFormatClass(CKANOutputFormat.class);
+    CKANOutputFormat.setEnvironmnet(job, ckanHost, ckanPort, sslEnabled, ckanAPIKey);
+    CKANOutputFormat.setOutputPkg(job, ckanOutput);
         
     // run the MapReduce job
     return job.waitForCompletion(true) ? 0 : 1;
 } // main
 ```
 
-As can be seen, everything is as usual in a MapReduce application... except for the input format; in order to use the CKAN extensions the `CKANInputFormat` class must be set. This class, when asked for the input splits definition, will create a bunch of `CKANInputSplit` objects, and when asked for a record reader for those input splits, it will create a specific `CKANRecordReader`.
+As can be seen, everything is as usual in a MapReduce application... except for the input and output formats; as can be seen, in order to use the CKAN extensions the `CKANInputFormat` and `CKANOutputFormat` classes must be set.
+
+[Top](#section0)
+
+####<a name="section3.1.2"></a>`CKANInputFormat` and related classes
+
+The `CKANInputFormat` class, as any other `InputFormat` class:
+
+* When asked for the input splits definition, will create a bunch of `CKANInputSplit` objects.
+* And when asked for a record reader for those input splits, it will create a specific `CKANRecordReader`.
 
 A `CKANInputSlit` references the resource where the records can be found, in addition to the offset start and length within that resource. Thus, assuming a CKAN resource has 3580 records and the maximum length for a split is set to 1000 then 4 splits will be defined:
 
@@ -247,12 +267,36 @@ The `CKANInputFormat` is configured by providing:
 * The port used to connect to the CKAN server, usually `80` or `443`.
 * If SSL is enabled (typically, this is equals to `true` if the `443` port is used).
 * The CKAN API key necessary to authenticate against the CKAN server.
-* The input data within CKAN taht will be analyzed.
+* The input data within CKAN that will be analyzed.
 * The splits lenght.
 
 Regarding the input data, worths mentioning this may be a CKAN <i>organization</i> name, a <i>package/dataset</i> name or a <i>resource</i> identifier. Both in the case of organizations and packages/datasets these are internally expanded until the resoure level. Thus for instance, by configuring a whole organization all the packages under it, and all the resources under all the packages will be processed. In addition, the method `setCKANInput` supports a list of comma-separated inputs of any type (e.g. you can combine a single organization with a subset of packages under any other organization, or selected resources from several packages related to several organizations).
 
-Finally, the application can be run as:
+[Top](#section0)
+
+####<a name="section3.1.3"></a>`CKANOutputFormat` and related classes
+
+The `CKANOutputFormat` class, as any other `OutputFormat` class, is in charge of:
+
+* Checking the output specifications are correct. In this case, it is checked the output package/dataset exists in CKAN. If not, it is created (if and only if the provided CKAN API key allows to do that).
+* Creating and output committer. In the case of CKAN, a dummy `CKANOutputCommitter` is created since no temporal, nor partial data is stored anywhere.
+* Creating a record writer. A `CKANRecordWriter` is provided on request, implementing all the necessary to create a new resource within the given output CKAN package/dataset
+
+The `CKANOutputFormat` is configured by providing:
+
+* The host where the CKAN server runs.
+* The port used to connect to the CKAN server, usually `80` or `443`.
+* If SSL is enabled (typically, this is equals to `true` if the `443` port is used).
+* The CKAN API key necessary to authenticate against the CKAN server.
+* The output package/dataset within CKAN where the output will be written.
+
+Regarding the output, this is always a package/dataset as above mentioned. An specific resource is not allowed since it is convenient the naming convention (the resource will be named as the concatenation of the running timestamp and the name of the job) and the format of the resource's data (a collection of (key, value) pairs, the same the reducers will be outputting) remains constant between several runs of the job.
+ 
+[Top](#section0)
+
+####<a name="section3.1.4"></a>Running `CKANMapReduceExample`
+
+The application can be run as:
 
     $ hadoop jar \
         target/ckan-protocol-0.1-jar-with-dependencies.jar \
@@ -263,13 +307,13 @@ Finally, the application can be run as:
         <ssl enabled=true|false> \
         <ckan API key> \
         <comma-separated list of ckan inputs> \
-        <hdfs output folder> \
+        <ckan output package> \
         <splits length>
         
-An example of run:
+An example of run (using a fake CKAN API key "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"):
 
 ```
-$ hadoop jar /home/user1/fiware-tidoop/target/tidoop-0.0.0_SNAPSHOT-jar-with-dependencies.jar com.telefonica.iot.tidoop.utils.CKANMapReduceExample -libjars /home/user1/fiware-tidoop/target/tidoop-0.0.0_SNAPSHOT-jar-with-dependencies.jar -D mapreduce.job.queuename=user1q data.lab.fiware.org 443 true 2d5bf021-ff9f-48e3-bb97-395b77581665 https://data.lab.fiware.org/dataset/logrono_cygnus/resource/ca73a799-9c71-4618-806e-7bd0ca1911f4 /user/user1/ckan_output 1000
+$ hadoop jar /home/user1/fiware-tidoop/target/tidoop-0.0.0_SNAPSHOT-jar-with-dependencies.jar com.telefonica.iot.tidoop.utils.CKANMapReduceExample -libjars /home/user1/fiware-tidoop/target/tidoop-0.0.0_SNAPSHOT-jar-with-dependencies.jar data.lab.fiware.org 443 true xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx https://data.lab.fiware.org/dataset/logrono_cygnus/resource/ca73a799-9c71-4618-806e-7bd0ca1911f4 https://data.lab.fiware.org/dataset/logrono_cygnus 1000
 15/02/25 17:29:17 INFO client.RMProxy: Connecting to ResourceManager at test-iot-hadoop3/10.0.0.112:8050
 15/02/25 17:29:18 INFO hdfs.DFSClient: Created HDFS_DELEGATION_TOKEN token 126 for user1 on ha-hdfs:testiotcloud
 15/02/25 17:29:18 INFO security.TokenCache: Got dt for hdfs://testiotcloud; Kind: HDFS_DELEGATION_TOKEN, Service: ha-hdfs:testiotcloud, Ident: (HDFS_DELEGATION_TOKEN token 126 for user1)
@@ -368,15 +412,18 @@ $ hadoop jar /home/user1/fiware-tidoop/target/tidoop-0.0.0_SNAPSHOT-jar-with-dep
 	File Input Format Counters 
 		Bytes Read=0
 	File Output Format Counters 
-		Bytes Written=13
+		Bytes Written=0
 ```
 
-As can be seen, the total size is computed:
+As can be seen, the total size is computed and added as a (key, value) pair in a resource called `1428932653961_CKAN-MapReduce-test`.
 
-```
-$ hadoop fs -cat ckan_output/part-r-00000
-size	1053716
-```
+![CKAN output](doc/images/ckan_output.png)
+
+[Top](#section0)
+
+####<a name="section3.1.5"></a>CKAN extensions in a hybrid scenario
+
+As can be imagined, not always a pure CKAN scenario is considered, i.e. not always the input data is stored in CKAN and the resulting output is intended to be stored at CKAN as well. Some times, the input is stored in HDFS or any other storage, but the output is written in CKAN; or viceversa, the input data comes from CKAN and the MapReduce result is wanted to be put into HDFS. In those cases, simply use `CKANInputFormat` or `CKANOutputFormat` depending on your scenario in combination with other `OutputFormat` or other `InputFormat`, respectively.
 
 [Top](#section0)
 
@@ -388,5 +435,7 @@ To be released.
 
 ##<a name="section4"></a>Contact
 Francisco Romero Bueno (francisco dot romerobueno at telefonica dot com)
+<br>
+German Toro del Valle (german dot torodelvalle at telefonica dot com)
 
 [Top](#section0)
