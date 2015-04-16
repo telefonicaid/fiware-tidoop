@@ -1,22 +1,21 @@
 /**
  * Copyright 2015 Telefonica Investigación y Desarrollo, S.A.U
  *
- * This file is part of fiware-connectors (FI-WARE project).
+ * This file is part of fiware-tidoop (FI-WARE project).
  *
- * fiware-connectors is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * fiware-tidoop is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
  * General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.
- * fiware-connectors is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * fiware-tidoop is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
  * for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with fiware-connectors. If not, see
+ * You should have received a copy of the GNU Affero General Public License along with fiware-tidoop. If not, see
  * http://www.gnu.org/licenses/.
  *
  * For those usages not covered by the GNU Affero General Public License please contact with
  * francisco.romerobueno at telefonica dot com
  */
-
 package com.telefonica.iot.tidoop.backends.ckan;
 
 import com.telefonica.iot.tidoop.http.HttpClientFactory;
@@ -70,12 +69,6 @@ public class CKANBackend {
         this.splitsLength = splitsLength;
         this.httpClientFactory = new HttpClientFactory(ssl);
     } // CKANBackend
-    
-    public String getHost() {return ckanHost;}
-    public String getPort() {return ckanPort;}
-    public boolean getSSL() {return ssl;}
-    public String getAPIKey() {return apiKey;}
-    public int getSplitsLength() {return splitsLength;}
     
     /**
      * Sets the Http client factory. It is protected since it is only going to be used by the tests.

@@ -1,26 +1,24 @@
 /**
  * Copyright 2015 Telefonica Investigación y Desarrollo, S.A.U
  *
- * This file is part of fiware-connectors (FI-WARE project).
+ * This file is part of fiware-tidoop (FI-WARE project).
  *
- * fiware-connectors is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * fiware-tidoop is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
  * General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.
- * fiware-connectors is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * fiware-tidoop is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
  * for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with fiware-connectors. If not, see
+ * You should have received a copy of the GNU Affero General Public License along with fiware-tidoop. If not, see
  * http://www.gnu.org/licenses/.
  *
  * For those usages not covered by the GNU Affero General Public License please contact with
  * francisco.romerobueno at telefonica dot com
  */
-
 package com.telefonica.iot.tidoop.hadoop.ckan;
 
 import com.telefonica.iot.tidoop.backends.ckan.CKANBackend;
-import java.io.IOException;
 import java.util.List;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputSplit;
@@ -87,14 +85,14 @@ public class CKANInputFormatTest {
     } // setUp
     
     /**
-     * Test of setCKANEnvironmnet method, of class CKANInputFormat.
+     * Test of setEnvironment method, of class CKANInputFormat.
      */
     @Test
     public void testSetCKANEnvironmnet() {
         System.out.println("Testing CKANInputFormat.setCKANEnvironmnet");
         
         try {
-            CKANInputFormat.setCKANEnvironmnet(job, ckanHost, ckanPort, enableSSL, ckanAPIKey);
+            CKANInputFormat.setEnvironment(job, ckanHost, ckanPort, enableSSL, ckanAPIKey);
             assertTrue(true);
         } catch (Exception e) {
             fail(e.getMessage());
@@ -102,14 +100,14 @@ public class CKANInputFormatTest {
     } // testSetCKANEnvironmnet
     
     /**
-     * Test of addCKANInput method, of class CKANInputFormat.
+     * Test of setInput method, of class CKANInputFormat.
      */
     @Test
     public void testAddCKANInput() {
         System.out.println("Testing CKANInputFormat.addCKANInput");
         
         try {
-            CKANInputFormat.addCKANInput(job, ckanInputRes);
+            CKANInputFormat.setInput(job, ckanInputRes);
             assertTrue(true);
         } catch (Exception e) {
             fail(e.getMessage());
@@ -117,14 +115,14 @@ public class CKANInputFormatTest {
     } // testAddCKANInput
     
     /**
-     * Test of setCKANSplitsLength method, of class CKANInputFormat.
+     * Test of setSplitsLength method, of class CKANInputFormat.
      */
     @Test
     public void testSetCKANSplitsLength() {
         System.out.println("Testing CKANInputFormat.addCKANInput");
         
         try {
-            CKANInputFormat.setCKANSplitsLength(job, splitsLength);
+            CKANInputFormat.setSplitsLength(job, splitsLength);
             assertTrue(true);
         } catch (Exception e) {
             fail(e.getMessage());
@@ -138,9 +136,9 @@ public class CKANInputFormatTest {
     public void testCreateRecordReader() {
         System.out.println("Testing CKANInputFormat.createRecordReader)");
         job.setInputFormatClass(CKANInputFormat.class);
-        CKANInputFormat.setCKANEnvironmnet(job, ckanHost, ckanPort, enableSSL, ckanAPIKey);
-        CKANInputFormat.addCKANInput(job, ckanInputRes);
-        CKANInputFormat.setCKANSplitsLength(job, splitsLength);
+        CKANInputFormat.setEnvironment(job, ckanHost, ckanPort, enableSSL, ckanAPIKey);
+        CKANInputFormat.setInput(job, ckanInputRes);
+        CKANInputFormat.setSplitsLength(job, splitsLength);
         CKANInputFormat inputFormat = new CKANInputFormat();
         RecordReader recordReader = inputFormat.createRecordReader(
                 new CKANInputSplit(resId, 0, 1000),
@@ -155,9 +153,9 @@ public class CKANInputFormatTest {
     public void testGetSplits() {
         System.out.println("Testing CKANInputFormat.getSplits (resource)");
         job.setInputFormatClass(CKANInputFormat.class);
-        CKANInputFormat.setCKANEnvironmnet(job, ckanHost, ckanPort, enableSSL, ckanAPIKey);
-        CKANInputFormat.addCKANInput(job, ckanInputRes);
-        CKANInputFormat.setCKANSplitsLength(job, splitsLength);
+        CKANInputFormat.setEnvironment(job, ckanHost, ckanPort, enableSSL, ckanAPIKey);
+        CKANInputFormat.setInput(job, ckanInputRes);
+        CKANInputFormat.setSplitsLength(job, splitsLength);
         CKANInputFormat inputFormat = new CKANInputFormat();
         inputFormat.setCKANBackend(backend);
         List<InputSplit> splits = inputFormat.getSplits(job);
@@ -165,9 +163,9 @@ public class CKANInputFormatTest {
 
         System.out.println("Testing CKANInputFormat.getSplits (package)");
         job.setInputFormatClass(CKANInputFormat.class);
-        CKANInputFormat.setCKANEnvironmnet(job, ckanHost, ckanPort, enableSSL, ckanAPIKey);
-        CKANInputFormat.addCKANInput(job, ckanInputPkg);
-        CKANInputFormat.setCKANSplitsLength(job, splitsLength);
+        CKANInputFormat.setEnvironment(job, ckanHost, ckanPort, enableSSL, ckanAPIKey);
+        CKANInputFormat.setInput(job, ckanInputPkg);
+        CKANInputFormat.setSplitsLength(job, splitsLength);
         inputFormat = new CKANInputFormat();
         inputFormat.setCKANBackend(backend);
         splits = inputFormat.getSplits(job);
@@ -175,9 +173,9 @@ public class CKANInputFormatTest {
         
         System.out.println("Testing CKANInputFormat.getSplits (organization)");
         job.setInputFormatClass(CKANInputFormat.class);
-        CKANInputFormat.setCKANEnvironmnet(job, ckanHost, ckanPort, enableSSL, ckanAPIKey);
-        CKANInputFormat.addCKANInput(job, ckanInputOrg);
-        CKANInputFormat.setCKANSplitsLength(job, splitsLength);
+        CKANInputFormat.setEnvironment(job, ckanHost, ckanPort, enableSSL, ckanAPIKey);
+        CKANInputFormat.setInput(job, ckanInputOrg);
+        CKANInputFormat.setSplitsLength(job, splitsLength);
         inputFormat = new CKANInputFormat();
         inputFormat.setCKANBackend(backend);
         splits = inputFormat.getSplits(job);

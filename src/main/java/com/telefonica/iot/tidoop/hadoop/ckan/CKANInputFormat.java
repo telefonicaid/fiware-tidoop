@@ -1,22 +1,21 @@
 /**
  * Copyright 2015 Telefonica Investigación y Desarrollo, S.A.U
  *
- * This file is part of fiware-connectors (FI-WARE project).
+ * This file is part of fiware-tidoop (FI-WARE project).
  *
- * fiware-connectors is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * fiware-tidoop is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
  * General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.
- * fiware-connectors is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * fiware-tidoop is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
  * for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with fiware-connectors. If not, see
+ * You should have received a copy of the GNU Affero General Public License along with fiware-tidoop. If not, see
  * http://www.gnu.org/licenses/.
  *
  * For those usages not covered by the GNU Affero General Public License please contact with
  * francisco.romerobueno at telefonica dot com
  */
-
 package com.telefonica.iot.tidoop.hadoop.ckan;
 
 import com.telefonica.iot.tidoop.backends.ckan.CKANBackend;
@@ -70,7 +69,7 @@ public class CKANInputFormat extends InputFormat<LongWritable, Text> {
      * @param ssl
      * @param ckanAPIKey
      */
-    public static void setCKANEnvironmnet(Job job, String ckanHost, String ckanPort, boolean ssl, String ckanAPIKey) {
+    public static void setEnvironment(Job job, String ckanHost, String ckanPort, boolean ssl, String ckanAPIKey) {
         job.getConfiguration().set(INPUT_CKAN_HOST, ckanHost);
         job.getConfiguration().set(INPUT_CKAN_PORT, ckanPort);
         job.getConfiguration().set(INPUT_CKAN_SSL, ssl ? "true" : "false");
@@ -90,7 +89,7 @@ public class CKANInputFormat extends InputFormat<LongWritable, Text> {
      * @param job
      * @param ckanURL
      */
-    public static void addCKANInput(Job job, String ckanURL) {
+    public static void setInput(Job job, String ckanURL) {
         Configuration conf = job.getConfiguration();
         String inputs = conf.get(INPUT_CKAN_URLS, "");
         
@@ -101,14 +100,14 @@ public class CKANInputFormat extends InputFormat<LongWritable, Text> {
         } // if else
         
         conf.set(INPUT_CKAN_URLS, inputs);
-    } // addCKANInput
+    } // setInput
     
     /**
      * Sets the CKAN splits length.
      * @param job
      * @param length
      */
-    public static void setCKANSplitsLength(Job job, String length) {
+    public static void setSplitsLength(Job job, String length) {
         job.getConfiguration().set(INPUT_CKAN_SPLITS_LENGTH, length);
     } // stCKANSplitsLength
 

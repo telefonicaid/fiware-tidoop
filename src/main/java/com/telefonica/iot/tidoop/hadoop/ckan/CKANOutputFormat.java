@@ -10,13 +10,12 @@
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
  * for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with fiware-connectors. If not, see
+ * You should have received a copy of the GNU Affero General Public License along with fiware-tidoop. If not, see
  * http://www.gnu.org/licenses/.
  *
  * For those usages not covered by the GNU Affero General Public License please contact with
  * francisco.romerobueno at telefonica dot com
  */
-
 package com.telefonica.iot.tidoop.hadoop.ckan;
 
 import com.telefonica.iot.tidoop.backends.ckan.CKANBackend;
@@ -64,7 +63,7 @@ public class CKANOutputFormat extends OutputFormat<Text, IntWritable> {
      * @param ssl
      * @param ckanAPIKey
      */
-    public static void setEnvironmnet(Job job, String ckanHost, String ckanPort, boolean ssl, String ckanAPIKey) {
+    public static void setEnvironment(Job job, String ckanHost, String ckanPort, boolean ssl, String ckanAPIKey) {
         job.getConfiguration().set(OUTPUT_CKAN_HOST, ckanHost);
         job.getConfiguration().set(OUTPUT_CKAN_PORT, ckanPort);
         job.getConfiguration().set(OUTPUT_CKAN_SSL, ssl ? "true" : "false");

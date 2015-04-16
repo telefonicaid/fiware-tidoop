@@ -113,11 +113,11 @@ Testing CKANRecordReader.getCurrentKey
 Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.191 sec
 Running com.telefonica.iot.tidoop.hadoop.ckan.CKANInputFormatTest
 Testing CKANInputFormat.setCKANEnvironmnet
-Testing CKANInputFormat.addCKANInput
+Testing CKANInputFormat.setInput
 Testing CKANInputFormat.getSplits (resource)
 Testing CKANInputFormat.getSplits (package)
 Testing CKANInputFormat.getSplits (organization)
-Testing CKANInputFormat.addCKANInput
+Testing CKANInputFormat.setInput
 Testing CKANInputFormat.createRecordReader)
 Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.757 sec
 Running com.telefonica.iot.tidoop.hadoop.ckan.CKANInputSplitTest
@@ -163,7 +163,7 @@ Map and Reduce classes are the following ones, they are very simple:
  * Mapper class. It receives a CKAN record pair (Object key, Text ckanRecord) and returns a (Text globalKey,
  * IntWritable recordLength) pair about a common global key and the length of the record.
  */
-public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable> {
+public static class RecordSizeGetter extends Mapper<Object, Text, Text, IntWritable> {
       
     private final Text globalKey = new Text("size");
     private final IntWritable recordLength = new IntWritable();
@@ -174,7 +174,7 @@ public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritab
         context.write(globalKey, recordLength);
     } // map
         
-} // TokenizerMapper
+} // RecordSizeGetter
 ```
 
 ```
@@ -182,7 +182,7 @@ public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritab
  * Reducer class. It receives a list of (Text globalKey, IntWritable length) pairs and computes the sum of all the
  * lengths, producing a final (Text globalKey, IntWritable totalLength).
  */
-public static class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+public static class RecordSizeAdder extends Reducer<Text, IntWritable, Text, IntWritable> {
         
     private final IntWritable totalLength = new IntWritable();
 
@@ -199,7 +199,7 @@ public static class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWr
         context.write(globalKey, totalLength);
     } // reduce
         
-} // IntSumReducer
+} // RecordSizeAdder
 ```
 
 The relevant part of the code can be found within the `main` class, where the MapReduce job is defined, configured and finally started:
@@ -225,15 +225,15 @@ public int run(String[] args) throws Exception {
     Configuration conf = this.getConf();
     Job job = Job.getInstance(conf, "CKAN MapReduce test");
     job.setJarByClass(CKANMapReduceExample.class);
-    job.setMapperClass(TokenizerMapper.class);
-    job.setCombinerClass(IntSumReducer.class);
-    job.setReducerClass(IntSumReducer.class);
+    job.setMapperClass(RecordSizeGetter.class);
+    job.setCombinerClass(RecordSizeAdder.class);
+    job.setReducerClass(RecordSizeAdder.class);
     job.setOutputKeyClass(Text.class);
     job.setOutputValueClass(IntWritable.class);
     job.setInputFormatClass(CKANInputFormat.class);
-    CKANInputFormat.addCKANInput(job, ckanInputs);
-    CKANInputFormat.setCKANEnvironmnet(job, ckanHost, ckanPort, sslEnabled, ckanAPIKey);
-    CKANInputFormat.setCKANSplitsLength(job, splitsLength);
+    CKANInputFormat.setInput(job, ckanInputs);
+    CKANInputFormat.setEnvironment(job, ckanHost, ckanPort, sslEnabled, ckanAPIKey);
+    CKANInputFormat.setSplitsLength(job, splitsLength);
     job.setOutputFormatClass(CKANOutputFormat.class);
     CKANOutputFormat.setEnvironmnet(job, ckanHost, ckanPort, sslEnabled, ckanAPIKey);
     CKANOutputFormat.setOutputPkg(job, ckanOutput);
