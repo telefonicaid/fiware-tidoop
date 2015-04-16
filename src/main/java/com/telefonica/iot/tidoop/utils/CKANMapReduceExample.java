@@ -1,22 +1,21 @@
 /**
  * Copyright 2015 Telefonica Investigación y Desarrollo, S.A.U
  *
- * This file is part of fiware-connectors (FI-WARE project).
+ * This file is part of fiware-tidoop (FI-WARE project).
  *
- * fiware-connectors is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+ * fiware-tidoop is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
  * General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.
- * fiware-connectors is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * fiware-tidoop is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
  * for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with fiware-connectors. If not, see
+ * You should have received a copy of the GNU Affero General Public License along with fiware-tidoop. If not, see
  * http://www.gnu.org/licenses/.
  *
  * For those usages not covered by the GNU Affero General Public License please contact with
  * francisco.romerobueno at telefonica dot com
  */
-
 package com.telefonica.iot.tidoop.utils;
 
 import com.telefonica.iot.tidoop.hadoop.ckan.CKANInputFormat;
@@ -48,7 +47,7 @@ public final class CKANMapReduceExample extends Configured implements Tool {
      * Mapper class. It receives a CKAN record pair (Object key, Text ckanRecord) and returns a (Text globalKey,
      * IntWritable recordLength) pair about a common global key and the length of the record.
      */
-    public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable> {
+    public static class RecordSizeGetter extends Mapper<Object, Text, Text, IntWritable> {
         
         private final Text globalKey = new Text("size");
         private final IntWritable recordLength = new IntWritable();
@@ -59,13 +58,13 @@ public final class CKANMapReduceExample extends Configured implements Tool {
             context.write(globalKey, recordLength);
         } // map
         
-    } // TokenizerMapper
+    } // RecordSizeGetter
 
     /**
      * Reducer class. It receives a list of (Text globalKey, IntWritable length) pairs and computes the sum of all the
      * lengths, producing a final (Text globalKey, IntWritable totalLength).
      */
-    public static class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+    public static class RecordSizeAdder extends Reducer<Text, IntWritable, Text, IntWritable> {
         
         private final IntWritable totalLength = new IntWritable();
 
@@ -82,7 +81,7 @@ public final class CKANMapReduceExample extends Configured implements Tool {
             context.write(globalKey, totalLength);
         } // reduce
         
-    } // IntSumReducer
+    } // RecordSizeAdder
 
     /**
      * Main class.
@@ -115,17 +114,17 @@ public final class CKANMapReduceExample extends Configured implements Tool {
         Configuration conf = this.getConf();
         Job job = Job.getInstance(conf, "CKAN MapReduce test");
         job.setJarByClass(CKANMapReduceExample.class);
-        job.setMapperClass(TokenizerMapper.class);
-        job.setCombinerClass(IntSumReducer.class);
-        job.setReducerClass(IntSumReducer.class);
+        job.setMapperClass(RecordSizeGetter.class);
+        job.setCombinerClass(RecordSizeAdder.class);
+        job.setReducerClass(RecordSizeAdder.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
         job.setInputFormatClass(CKANInputFormat.class);
-        CKANInputFormat.addCKANInput(job, ckanInputs);
-        CKANInputFormat.setCKANEnvironmnet(job, ckanHost, ckanPort, sslEnabled, ckanAPIKey);
-        CKANInputFormat.setCKANSplitsLength(job, splitsLength);
+        CKANInputFormat.setInput(job, ckanInputs);
+        CKANInputFormat.setEnvironment(job, ckanHost, ckanPort, sslEnabled, ckanAPIKey);
+        CKANInputFormat.setSplitsLength(job, splitsLength);
         job.setOutputFormatClass(CKANOutputFormat.class);
-        CKANOutputFormat.setEnvironmnet(job, ckanHost, ckanPort, sslEnabled, ckanAPIKey);
+        CKANOutputFormat.setEnvironment(job, ckanHost, ckanPort, sslEnabled, ckanAPIKey);
         CKANOutputFormat.setOutputPkg(job, ckanOutput);
         
         // run the MapReduce job

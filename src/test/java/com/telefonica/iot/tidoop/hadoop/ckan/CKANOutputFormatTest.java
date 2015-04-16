@@ -10,7 +10,7 @@
  * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
  * for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with fiware-connectors. If not, see
+ * You should have received a copy of the GNU Affero General Public License along with fiware-tidoop. If not, see
  * http://www.gnu.org/licenses/.
  *
  * For those usages not covered by the GNU Affero General Public License please contact with
@@ -81,14 +81,14 @@ public class CKANOutputFormatTest {
     } // setUp
     
     /**
-     * Test of setEnvironmnet method, of class CKANOutputFormat.
+     * Test of setEnvironment method, of class CKANOutputFormat.
      */
     @Test
     public void testSetEnvironmnet() {
         System.out.println("Testing CKANOutputFormat.setEnvironmnet");
         
         try {
-            CKANOutputFormat.setEnvironmnet(job, ckanHost, ckanPort, enableSSL, ckanAPIKey);
+            CKANOutputFormat.setEnvironment(job, ckanHost, ckanPort, enableSSL, ckanAPIKey);
             assertTrue(true);
         } catch (Exception e) {
             fail(e.getMessage());
@@ -117,7 +117,7 @@ public class CKANOutputFormatTest {
     public void testGetRecordWriter() {
         System.out.println("Testing CKANOutputFormat.getRecordWriter)");
         job.setOutputFormatClass(CKANOutputFormat.class);
-        CKANOutputFormat.setEnvironmnet(job, ckanHost, ckanPort, enableSSL, ckanAPIKey);
+        CKANOutputFormat.setEnvironment(job, ckanHost, ckanPort, enableSSL, ckanAPIKey);
         CKANOutputFormat.setOutputPkg(job, ckanOutputRes);
         CKANOutputFormat outputFormat = new CKANOutputFormat();
         RecordWriter recordWriter = null;
