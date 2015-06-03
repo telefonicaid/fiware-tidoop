@@ -36,17 +36,23 @@ Finally, it is worth to mention MapReduce jobs available within this library can
 
 Maven (and thus Java SDK, since Maven is a Java tool) is needed in order to build tidoop-hadoop-ext.
 
-In order to install Java SDK (not JRE), just type (CentOS machines):
+In order to install Java SDK (not JRE) version 1.6.0 or higher, just type one of the following options (as a sudoer):
 
-    $ yum install java-1.6.0-openjdk-devel
+    $ sudo yum install java-1.6.0-openjdk-devel   (JDK 6 for Fedora, RHEL, CentOS machines)
+    $ sudo yum install java-1.7.0-openjdk-devel   (JDK 7 for Fedora, RHEL, CentOS machines)
+    $ sudo apt-get install openjdk-6-jdk          (JDK 6 for Debian, Ubuntu machines)
+    $ sudo apt-get install openjdk-7-jdk          (JDK 7 for Debian, Ubuntu machines)
 
-Remember to export the JAVA_HOME environment variable. In the case of using `yum install` as shown above, it would be:
+Please observe [Open JDK](http://openjdk.java.net/install/) is installed. Remember to export the JAVA_HOME environment variable, just type one of the following options:
 
-    $ export JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk.x86_64
+    $ export JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk.x86_64   (JDK 6 for Fedora, RHEL, CentOS machines)
+    $ export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk.x86_64   (JDK 7 for Fedora, RHEL, CentOS machines)
+    $ export JAVA_HOME=/usr/lib/jvm/java-6-openjdk              (JDK 6 for Debian, Ubuntu machines)
+    $ export JAVA_HOME=/usr/lib/jvm/java-7-openjdk              (JDK 7 for Debian, Ubuntu machines)
 
 In order to do it permanently, edit `/root/.bash_profile` (`root` user) or `/etc/profile` (other users).
 
-Maven is installed by downloading it from [maven.apache.org](http://maven.apache.org/download.cgi). Install it in a folder of your choice (represented by `APACHE_MAVEN_HOME`):
+Maven (3.2.5 or higher) is installed by downloading it from [maven.apache.org](http://maven.apache.org/download.cgi). Install it in a folder of your choice (represented by `APACHE_MAVEN_HOME`):
 
     $ wget http://www.eu.apache.org/dist/maven/maven-3/3.2.5/binaries/apache-maven-3.2.5-bin.tar.gz
     $ tar xzvf apache-maven-3.2.5-bin.tar.gz
