@@ -1,1 +1,3 @@
-- Hadoop extensions for CKAN (#1)
+- [tidoop-hadoop-ext] [FEATURE] Hadoop extensions for CKAN (read mode) (#1)
+- [tidoop-hadoop-ext] [FEATURE] Hadoop extensions for CKAN (write mode) (#6)
+- [tidoop-mr-lib] [FEATURE] Add Filter MR job (#15)

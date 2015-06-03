@@ -4,7 +4,7 @@
 
   <groupId>com.telefonica.iot.tidoop</groupId>
   <artifactId>tidoop-mr-lib</artifactId>
-  <version>0.0.0_SNAPSHOT</version>
+  <version>0.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>tidoop-mr-lib</name>
