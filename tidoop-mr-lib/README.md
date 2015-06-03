@@ -23,7 +23,7 @@
 
 ##<a name="whatis"></a>What is tidoop-mr-lib
 
-tidoop-mr-lib is a library of already developed-ready to use [MapReduce](http://research.google.com/archive/mapreduce.html) jobs for [Hadoop](https://hadoop.apache.org), allowing data scientists and engineers in genaral for an easy and quick approach to Big Data analysis.
+tidoop-mr-lib is a library of already developed-ready to use [MapReduce](http://research.google.com/archive/mapreduce.html) jobs for [Hadoop](https://hadoop.apache.org), allowing data scientists and engineers in general for an easy and quick approach to Big Data analysis.
 
 Available jobs can be used either to transform an input dataset, either to compute a value from it. Usually, these transformations or computations are suited for any general dataset, nevertheless there are NGSI specific MapReduce jobs simplifying a lot the process of analyzing NGSI-like context data. Have a look on this and many other ways of classifying the jobs in the [library details](#details) section.
 
@@ -70,7 +70,7 @@ or not:
     $ git checkout <branch>
     $ APACHE_MAVEN_HOME/bin/mvn package
 
-where `<branch>` is `develop` if you are trying to install the latest features or `release/x.y.z` if you are trying to install a stable release.
+where `<branch>` is `develop` if you are installing the latest features or `release/x.y.z` if you are installing a stable release.
 
 If the dependencies are included in the built tidoop-mr-lib package, then nothing has to be done. If not, and depending on the tidoop-mr-lib components you are going to use, you may need to install additional .jar files somewhere in the classpath. Typically, you can get the .jar file from your Maven repository (under `/home/<your_user>/.m2` folder in your user home directory) and use the `cp` command.
 
@@ -181,13 +181,13 @@ On the other hand there are <i><b>computation</b></i> jobs in charge of returnin
 
 ####<a name="genericngsi"></a>Generic and NGSI specific jobs
 
-Of special interest are <i><b>NGSI specific</b></i> jobs that are only valid for NGSI-like datasets, such as those created by [Cygnus](https://github.com/telefonicaid/fiware-cygnus). Usually, these jobs have their <i><b>generic</b></i> counterpart, but the specific format of NGSI-like data (a Json document with several custom fields) makes very hard to obtain the desired transformation or computation. For instance, computing the average of a certain entity's attribute will require at least a map job on all the NGSI data lines in order to obtain the desired value, and then the average job itself; nevertheless, there exists a single NGSI job dealing with such a computation. Another example could be filtering by entity type, which is a transformation: by using the generic version, a complex regular expresion must be used not only covering the entity type value itself but also covering the search for the field name containing the entity type; the NGSI version only requires a regular expresion for the entity type.
+Of special interest are <i><b>NGSI specific</b></i> jobs that are only valid for NGSI-like datasets, such as those created by [Cygnus](https://github.com/telefonicaid/fiware-cygnus). Usually, these jobs have their <i><b>generic</b></i> counterpart, but the specific format of NGSI-like data (a JSON document with several custom fields) makes very hard to obtain the desired transformation or computation. For instance, computing the average of a certain entity's attribute will require at least a map job on all the NGSI data lines in order to obtain the desired value, and then the average job itself; nevertheless, there exists a single NGSI job dealing with such a computation. Another example could be filtering by entity type, which is a transformation: by using the generic version, a complex regular expresion must be used not only covering the entity type value itself but also covering the search for the field name containing the entity type; the NGSI version only requires a regular expresion for the entity type.
 
 [Top](#top)
 
 ####<a name="flatkeyvalue"></a>Flat and key-value jobs
 
-Finally, there are (transformation, NGSI or not) jobs that add keys as part of their functionallity, while there are other (transformation, NGSI or not) jobs not adding keys at all. There are also other (computation, NSI or not) jobs allowing to add a custom key to the output they generate.
+Finally, there are (transformation, NGSI or not) jobs that add keys as part of their functionallity, while there are other (transformation, NGSI or not) jobs not adding keys at all. There are also other (computation, NGSI or not) jobs allowing to add a custom key to the output they generate.
 
 [Top](#top)
 
