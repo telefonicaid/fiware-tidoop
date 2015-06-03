@@ -47,10 +47,11 @@ public final class Filter extends Configured implements Tool {
     public static class LineFilter extends Mapper<Object, Text, Text, Text> {
         
         private Pattern pattern = null;
-        private final Text globalKey = new Text("line");
+        private final Text commonKey = new Text("common-key");
 
         @Override
         public void setup(Context context) throws IOException, InterruptedException {
+            // compile just once the regex; use an empty regex if no one is provided
             pattern = Pattern.compile(context.getConfiguration().get(Constants.PARAM_REGEX, ""));
         } // setup
 
@@ -59,11 +60,28 @@ public final class Filter extends Configured implements Tool {
             Matcher matcher = pattern.matcher(value.toString());
 
             if (matcher.matches()) {
-                context.write(globalKey, value);
+                context.write(commonKey, value);
             } // if
         } // map
         
     } // LineFilter
+    
+    /**
+     * Combiner class. It implements the same code than the reducer class, except for the emitted (k,v) pair: in the
+     * reducer the emitted pair is about (NullWritable,Text) but the combiner must emit the pairs as if they were
+     * emitted by the mapper, thus is about emitting (Text,Text) pairs.
+     */
+    public static class LinesCombiner extends Reducer<Text, Text, Text, Text> {
+        
+        @Override
+        public void reduce(Text key, Iterable<Text> filteredLines, Context context)
+            throws IOException, InterruptedException {
+            for (Text filteredLine : filteredLines) {
+                context.write(key, filteredLine);
+            } // for
+        } // reduce
+        
+    } // LinesCombiner
 
     /**
      * Reducer class.
@@ -71,7 +89,7 @@ public final class Filter extends Configured implements Tool {
     public static class LinesJoiner extends Reducer<Text, Text, NullWritable, Text> {
 
         @Override
-        public void reduce(Text globalKey, Iterable<Text> filteredLines, Context context)
+        public void reduce(Text key, Iterable<Text> filteredLines, Context context)
             throws IOException, InterruptedException {
             for (Text filteredLine : filteredLines) {
                 context.write(NullWritable.get(), filteredLine);
@@ -107,10 +125,13 @@ public final class Filter extends Configured implements Tool {
         Configuration conf = this.getConf();
         conf.set(Constants.PARAM_REGEX, regex);
         Job job = Job.getInstance(conf, "tidoop-mr-lib-filter");
+        job.setNumReduceTasks(1);
         job.setJarByClass(Filter.class);
         job.setMapperClass(LineFilter.class);
-        job.setCombinerClass(LinesJoiner.class);
+        job.setCombinerClass(LinesCombiner.class);
         job.setReducerClass(LinesJoiner.class);
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(Text.class);
         job.setOutputKeyClass(NullWritable.class);
         job.setOutputValueClass(Text.class);
         FileInputFormat.addInputPath(job, new Path(input));
