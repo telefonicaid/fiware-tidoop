@@ -31,6 +31,7 @@ public final class Constants {
     private Constants() {
     } // Constants
     
-    public static final String PARAM_REGEX = "regex";
+    public static final String PARAM_REGEX = "param_regex";
+    public static final String PARAM_FUNCTION = "param_function";
     
 } // Constants
