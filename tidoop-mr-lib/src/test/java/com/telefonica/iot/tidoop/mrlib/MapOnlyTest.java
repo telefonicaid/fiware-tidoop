@@ -18,17 +18,12 @@
  */
 package com.telefonica.iot.tidoop.mrlib;
 
-import com.telefonica.iot.tidoop.mrlib.Filter.LineFilter;
-import com.telefonica.iot.tidoop.mrlib.Filter.LinesCombiner;
-import com.telefonica.iot.tidoop.mrlib.Filter.LinesJoiner;
+import com.telefonica.iot.tidoop.mrlib.MapOnly.CustomMapper;
 import com.telefonica.iot.tidoop.mrlib.utils.Constants;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Before;
@@ -43,28 +38,20 @@ import org.mockito.runners.MockitoJUnitRunner;
  * @author frb
  */
 @RunWith(MockitoJUnitRunner.class)
-public class FilterTest {
+public class MapOnlyTest {
     
     // instances to be tested
-    private LineFilter mapper;
-    private LinesCombiner combiner;
-    private LinesJoiner reducer;
+    private CustomMapper mapper;
     
     // mocks
     @Mock
     private Mapper.Context mockContextMapper;
     @Mock
-    private Reducer.Context mockContextCombinerReducer;
-    @Mock
     private Configuration mockConfiguration;
     
     // constants
-    private final Text matchingLine = new Text("this line matches because contains xxx");
-    private final Text notMatchingLine = new Text("this line does not match");
-    private final String regex = "^.*\bxxx\b.*$";
-    private final Text combinerReducerKey = new Text("common-key");
-    private final Iterable<Text> filteredLines = new ArrayList<Text>(
-            Arrays.asList(new Text("line1"), new Text("line2"), new Text("line3")));
+    private final String functionStr = "long y = x * x";
+    private final Text line = new Text("6");
     
     /**
      * Sets up tests by creating a unique instance of the tested class, and by defining the behaviour of the mocked
@@ -75,17 +62,15 @@ public class FilterTest {
     @Before
     public void setUp() throws Exception {
         // set up the instances of the tested classes
-        mapper = new LineFilter();
-        combiner = new LinesCombiner();
-        reducer = new LinesJoiner();
+        mapper = new CustomMapper();
         
         // set up the behaviour of the mocked classes
         when(mockContextMapper.getConfiguration()).thenReturn(mockConfiguration);
-        when(mockConfiguration.get(Constants.PARAM_REGEX, "")).thenReturn(regex);
+        when(mockConfiguration.get(Constants.PARAM_FUNCTION, "long y = x")).thenReturn(functionStr);
     } // setUp
     
     /**
-     * Test of setup method, of class LineFilter.
+     * Test of setup method, of class CustomMapper.
      */
     @Test
     public void testLineFilterSetup() {
@@ -101,13 +86,13 @@ public class FilterTest {
     } // testLineFilterSetup
     
     /**
-     * Test of map method, of class LineFilter. The line matches the regex and passes.
+     * Test of map method, of class CustomMapper. The function is applied to the line.
      */
     @Test
     public void testLineFilterMapRegexMatching() {
         try {
             mapper.setup(mockContextMapper);
-            mapper.map(null, matchingLine, mockContextMapper);
+            mapper.map(null, line, mockContextMapper);
         } catch (IOException e) {
             fail(e.getMessage());
         } catch (InterruptedException e) {
@@ -117,53 +102,4 @@ public class FilterTest {
         } // try catch finally
     } // testLineFilterMapRegexMatching
     
-    /**
-     * Test of map method, of class LineFilter. The line does not match the regex and does not pass.
-     */
-    @Test
-    public void testLineFilterMapRegexNotMatching() {
-        try {
-            mapper.setup(mockContextMapper);
-            mapper.map(null, notMatchingLine, mockContextMapper);
-        } catch (IOException e) {
-            fail(e.getMessage());
-        } catch (InterruptedException e) {
-            fail(e.getMessage());
-        } finally {
-            assertTrue(true);
-        } // try catch finally
-    } // testLineFilterMapRegexNotMatching
-    
-    /**
-     * Test of reduce method, of class LinesCombiner.
-     */
-    @Test
-    public void testLinesCombinerReduce() {
-        try {
-            combiner.reduce(combinerReducerKey, filteredLines, mockContextCombinerReducer);
-        } catch (IOException e) {
-            fail(e.getMessage());
-        } catch (InterruptedException e) {
-            fail(e.getMessage());
-        } finally {
-            assertTrue(true);
-        } // try catch finally
-    } // testLinesCombinerReduce
-    
-    /**
-     * Test of reduce method, of class LinesJoiner.
-     */
-    @Test
-    public void testLinesJoinerReduce() {
-        try {
-            combiner.reduce(combinerReducerKey, filteredLines, mockContextCombinerReducer);
-        } catch (IOException e) {
-            fail(e.getMessage());
-        } catch (InterruptedException e) {
-            fail(e.getMessage());
-        } finally {
-            assertTrue(true);
-        } // try catch finally
-    } // testLinesJoinerReduce
-    
-} // FilterTest
+} // MapOnlyTest
