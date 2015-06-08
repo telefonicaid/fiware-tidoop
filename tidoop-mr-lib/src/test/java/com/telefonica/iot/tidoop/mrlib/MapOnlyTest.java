@@ -69,7 +69,8 @@ public class MapOnlyTest {
         
         // set up the behaviour of the mocked classes
         when(mockContextMapper.getConfiguration()).thenReturn(mockConfiguration);
-        when(mockConfiguration.get(Constants.PARAM_FUNCTION, "double y = x")).thenReturn(codeOK, codeBadType, codeEmpty, codeMultiple);
+        when(mockConfiguration.get(Constants.PARAM_FUNCTION, "String y = x")).thenReturn(
+                codeOK, codeBadType, codeEmpty, codeMultiple);
     } // setUp
     
     /**

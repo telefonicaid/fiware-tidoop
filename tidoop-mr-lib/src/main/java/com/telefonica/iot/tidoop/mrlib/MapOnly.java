@@ -46,11 +46,12 @@ public class MapOnly extends Configured implements Tool {
      */
     public static class CustomMapper extends Mapper<Object, Text, NullWritable, Text> {
         
-        private Function mapFunction = null;
+        private UserDefinedFunction mapFunction = null;
 
         @Override
         public void setup(Context context) throws IOException, InterruptedException {
-            mapFunction = new Function(context.getConfiguration().get(Constants.PARAM_FUNCTION, "double y = x"));
+            mapFunction = new UserDefinedFunction(
+                    context.getConfiguration().get(Constants.PARAM_FUNCTION, "String y = x"));
         } // setup
 
         @Override
