@@ -30,10 +30,10 @@ import org.mockito.runners.MockitoJUnitRunner;
  * @author frb
  */
 @RunWith(MockitoJUnitRunner.class)
-public class FunctionTest {
+public class UserDefinedFunctionTest {
     
     // instance to be tested
-    private Function function;
+    private UserDefinedFunction function;
     
     // constants
     private final String functionStr = "long y = x * x";
@@ -47,7 +47,7 @@ public class FunctionTest {
     @Before
     public void setUp() throws Exception {
         // set up the instance of the tested class
-        function = new Function(functionStr);
+        function = new UserDefinedFunction(functionStr);
     } // setUp
     
     /**
@@ -56,7 +56,7 @@ public class FunctionTest {
     @Test
     public void testConstructor() {
         assertEquals(NumericType.LONG, function.getType());
-        assertEquals("y = x * x", function.getFunction());
+        assertEquals("long y = x * x", function.getCode());
     } // testLineFilterSetup
     
-} // FunctionTest
+} // UserDefinedFunctionTest

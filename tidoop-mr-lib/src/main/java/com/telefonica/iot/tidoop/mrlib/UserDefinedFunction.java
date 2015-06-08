@@ -28,9 +28,9 @@ import org.apache.log4j.Logger;
  *
  * @author frb
  */
-public class Function {
+public class UserDefinedFunction {
     
-    private final Logger logger = Logger.getLogger(Function.class);
+    private final Logger logger = Logger.getLogger(UserDefinedFunction.class);
     private final Interpreter interpreter;
     private NumericType inputType;
     private NumericType outputType;
@@ -40,7 +40,7 @@ public class Function {
      * Constructor.
      * @param code
      */
-    public Function(String code) {
+    public UserDefinedFunction(String code) {
         // create a beanshell interpreter
         interpreter = new Interpreter();
         
@@ -85,7 +85,7 @@ public class Function {
         
         // set the code to be evaluated
         this.code = code;
-    } // Function
+    } // UserDefinedFunction
     
     private void setToIdentityFunction() {
         inputType = NumericType.STRING;
@@ -105,9 +105,9 @@ public class Function {
      * Gets the string representation of the code.
      * @return The string representation of the code
      */
-    public String getFunction() {
+    public String getCode() {
         return code;
-    } // getFunction
+    } // getCode
     
     /**
      * Evals y(x).
@@ -195,4 +195,4 @@ public class Function {
         } // switch
     } // get
     
-} // Function
+} // UserDefinedFunction
