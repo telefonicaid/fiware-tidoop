@@ -18,7 +18,6 @@
  */
 package com.telefonica.iot.tidoop.mrlib;
 
-import com.telefonica.iot.tidoop.mrlib.io.TidoopObject;
 import com.telefonica.iot.tidoop.mrlib.utils.Constants;
 import java.io.IOException;;
 import org.apache.hadoop.conf.Configuration;
@@ -45,7 +44,7 @@ public class MapOnly extends Configured implements Tool {
     /**
      * Mapper class.
      */
-    public static class CustomMapper extends Mapper<Object, Text, NullWritable, TidoopObject> {
+    public static class CustomMapper extends Mapper<Object, Text, NullWritable, Text> {
         
         private Function mapFunction = null;
 
@@ -92,9 +91,9 @@ public class MapOnly extends Configured implements Tool {
         job.setJarByClass(MapOnly.class);
         job.setMapperClass(CustomMapper.class);
         job.setMapOutputKeyClass(NullWritable.class);
-        job.setMapOutputValueClass(TidoopObject.class);
+        job.setMapOutputValueClass(Text.class);
         job.setOutputKeyClass(NullWritable.class);
-        job.setOutputValueClass(TidoopObject.class);
+        job.setOutputValueClass(Text.class);
         FileInputFormat.addInputPath(job, new Path(input));
         FileOutputFormat.setOutputPath(job, new Path(output));
         

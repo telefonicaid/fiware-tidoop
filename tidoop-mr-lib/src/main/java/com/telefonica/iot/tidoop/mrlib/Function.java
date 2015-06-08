@@ -20,7 +20,6 @@ package com.telefonica.iot.tidoop.mrlib;
 
 import bsh.EvalError;
 import bsh.Interpreter;
-import com.telefonica.iot.tidoop.mrlib.io.TidoopObject;
 import com.telefonica.iot.tidoop.mrlib.io.NumericType;
 import org.apache.hadoop.io.Text;
 import org.apache.log4j.Logger;
@@ -41,18 +40,34 @@ public class Function {
      * @param functionStr
      */
     public Function(String functionStr) {
-        String[] split = functionStr.split(" ");
+        String[] split = functionStr.split(" ", 2);
         type = getType(split[0]);
         function = split[1];
         interpreter = new Interpreter(); // beanshell interpreter for the function
     } // Function
     
     /**
+     * Gets the type of the function.
+     * @return The type of the function
+     */
+    public NumericType getType() {
+        return type;
+    } // getType
+    
+    /**
+     * Gets the string representation of the function.
+     * @return The string representation of the function
+     */
+    public String getFunction() {
+        return function;
+    } // getFunction
+    
+    /**
      * Evals y(x).
      * @param x
      * @return y
      */
-    public TidoopObject eval(Text x) {
+    public Text eval(Text x) {
         try {
             switch (type) {
                 case INT:
@@ -76,8 +91,8 @@ public class Function {
             
             interpreter.eval(function);
             Object y = interpreter.get("y");
-            // Object is not HDFS writabe, thus convert it to TidoopObject
-            return TidoopObject.get(y, type);
+            // Object is not HDFS writabe, thus convert it to Text
+            return toText(y, type);
         } catch (EvalError e) {
             logger.error("Error while evaluating the function. Details: " + e.getMessage());
             return null;
@@ -99,5 +114,28 @@ public class Function {
             return NumericType.UNKNOWN;
         } // if else if
     } // getType
+    
+    /**
+     * 
+     * @param o
+     * @param functionType
+     * @return
+     */
+    public static Text toText(Object o, NumericType functionType) {
+        switch (functionType) {
+            case INT:
+                return new Text(((Integer) o).toString());
+            case LONG:
+                return new Text(((Long) o).toString());
+            case FLOAT:
+                return new Text(((Float) o).toString());
+            case DOUBLE:
+                return new Text(((Double) o).toString());
+            case BOOLEAN:
+                return new Text(((Boolean) o).toString());
+            default:
+                return null;
+        } // switch
+    } // get
     
 } // Function
