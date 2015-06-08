@@ -50,7 +50,10 @@ public class MapOnlyTest {
     private Configuration mockConfiguration;
     
     // constants
-    private final String functionStr = "long y = x * x";
+    private final String codeOK = "long y = x * x;";
+    private final String codeBadType = "longer y = x * x;";
+    private final String codeEmpty = "";
+    private final String codeMultiple = "long z = x * x; String y = z + \"_sufix\";";
     private final Text line = new Text("6");
     
     /**
@@ -66,14 +69,14 @@ public class MapOnlyTest {
         
         // set up the behaviour of the mocked classes
         when(mockContextMapper.getConfiguration()).thenReturn(mockConfiguration);
-        when(mockConfiguration.get(Constants.PARAM_FUNCTION, "long y = x")).thenReturn(functionStr);
+        when(mockConfiguration.get(Constants.PARAM_FUNCTION, "double y = x")).thenReturn(codeOK, codeBadType, codeEmpty, codeMultiple);
     } // setUp
     
     /**
      * Test of setup method, of class CustomMapper.
      */
     @Test
-    public void testLineFilterSetup() {
+    public void testCustomMapperSetup() {
         try {
             mapper.setup(mockContextMapper);
         } catch (IOException e) {
@@ -83,13 +86,15 @@ public class MapOnlyTest {
         } finally {
             assertTrue(true);
         } // try catch finally
-    } // testLineFilterSetup
+    } // testCustomMapperSetup
     
     /**
-     * Test of map method, of class CustomMapper. The function is applied to the line.
+     * Test of map method, of class CustomMapper.
      */
     @Test
-    public void testLineFilterMapRegexMatching() {
+    public void testCustomMapperMap() {
+        System.out.println("CustomMap.map (the function is applied to the line)");
+        
         try {
             mapper.setup(mockContextMapper);
             mapper.map(null, line, mockContextMapper);
@@ -100,6 +105,58 @@ public class MapOnlyTest {
         } finally {
             assertTrue(true);
         } // try catch finally
-    } // testLineFilterMapRegexMatching
+        
+        System.out.println("CustomMap.map (the function type is bad thus the identity function is used instead");
+   
+        try {
+            mapper.setup(mockContextMapper);
+            mapper.map(null, line, mockContextMapper);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        } finally {
+            assertTrue(true);
+        } // try catch finally
+        
+        System.out.println("CustomMap.map (the function is empty thus the identity function is used instead");
+   
+        try {
+            mapper.setup(mockContextMapper);
+            mapper.map(null, line, mockContextMapper);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        } finally {
+            assertTrue(true);
+        } // try catch finally
+        
+        System.out.println("CustomMap.map (the function sentences are multiple");
+   
+        try {
+            mapper.setup(mockContextMapper);
+            mapper.map(null, line, mockContextMapper);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        } finally {
+            assertTrue(true);
+        } // try catch finally
+        
+        System.out.println("CustomMap.map (the function is null thus the identity function is used instead");
+   
+        try {
+            mapper.map(null, line, mockContextMapper);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        } catch (InterruptedException e) {
+            fail(e.getMessage());
+        } finally {
+            assertTrue(true);
+        } // try catch finally
+        
+    } // testCustomMapperMap
     
 } // MapOnlyTest
