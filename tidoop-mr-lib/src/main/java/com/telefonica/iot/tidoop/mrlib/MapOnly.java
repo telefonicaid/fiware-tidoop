@@ -18,8 +18,7 @@
  */
 package com.telefonica.iot.tidoop.mrlib;
 
-import bsh.EvalError;
-import bsh.Interpreter;
+import com.telefonica.iot.tidoop.mrlib.io.TidoopObject;
 import com.telefonica.iot.tidoop.mrlib.utils.Constants;
 import java.io.IOException;;
 import org.apache.hadoop.conf.Configuration;
@@ -33,7 +32,6 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -47,28 +45,18 @@ public class MapOnly extends Configured implements Tool {
     /**
      * Mapper class.
      */
-    public static class CustomMapper extends Mapper<Object, Text, NullWritable, Object> {
+    public static class CustomMapper extends Mapper<Object, Text, NullWritable, TidoopObject> {
         
-        private Interpreter interpreter = null;
-        private String mapFunction = null;
+        private Function mapFunction = null;
 
         @Override
         public void setup(Context context) throws IOException, InterruptedException {
-            // create a beanshell interpreter for the map function
-            interpreter = new Interpreter();
-            mapFunction = context.getConfiguration().get(Constants.PARAM_FUNCTION, "");
+            mapFunction = new Function(context.getConfiguration().get(Constants.PARAM_FUNCTION, "long y = x"));
         } // setup
 
         @Override
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-            try {
-                interpreter.set("x", value);
-                interpreter.eval(mapFunction);
-                Object y = interpreter.get("y");
-                context.write(NullWritable.get(), y);
-            } catch (EvalError e) {
-                logger.error("Error while evaluating the mapping function: " + e.getMessage());
-            } // try catch
+            context.write(NullWritable.get(), mapFunction.eval(value));
         } // map
         
     } // CustomMapper
@@ -79,7 +67,7 @@ public class MapOnly extends Configured implements Tool {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        int res = ToolRunner.run(new Configuration(), new Filter(), args);
+        int res = ToolRunner.run(new Configuration(), new MapOnly(), args);
         System.exit(res);
     } // main
     
@@ -101,14 +89,12 @@ public class MapOnly extends Configured implements Tool {
         conf.set(Constants.PARAM_FUNCTION, mapFunction);
         Job job = Job.getInstance(conf, "tidoop-mr-lib-maponly");
         job.setNumReduceTasks(0);
-        job.setJarByClass(Filter.class);
-        job.setMapperClass(Filter.LineFilter.class);
-        job.setCombinerClass(Filter.LinesCombiner.class);
-        job.setReducerClass(Filter.LinesJoiner.class);
-        job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(Text.class);
+        job.setJarByClass(MapOnly.class);
+        job.setMapperClass(CustomMapper.class);
+        job.setMapOutputKeyClass(NullWritable.class);
+        job.setMapOutputValueClass(TidoopObject.class);
         job.setOutputKeyClass(NullWritable.class);
-        job.setOutputValueClass(Text.class);
+        job.setOutputValueClass(TidoopObject.class);
         FileInputFormat.addInputPath(job, new Path(input));
         FileOutputFormat.setOutputPath(job, new Path(output));
         
