@@ -26,4 +26,4 @@ package com.telefonica.iot.tidoop.mrlib.io;
 /**
  * Enum about Tidoop types.
  */
-public enum NumericType { INT, LONG, FLOAT, DOUBLE, BOOLEAN, UNKNOWN }
+public enum NumericType { INT, LONG, FLOAT, DOUBLE, BOOLEAN, STRING, UNKNOWN }
