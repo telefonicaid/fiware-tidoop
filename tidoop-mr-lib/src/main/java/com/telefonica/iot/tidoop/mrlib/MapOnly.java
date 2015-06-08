@@ -19,7 +19,7 @@
 package com.telefonica.iot.tidoop.mrlib;
 
 import com.telefonica.iot.tidoop.mrlib.utils.Constants;
-import java.io.IOException;;
+import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
  */
 public class MapOnly extends Configured implements Tool {
     
-    private final static Logger logger = Logger.getLogger(MapOnly.class);
+    private static final Logger LOGGER = Logger.getLogger(MapOnly.class);
     
     /**
      * Mapper class.
@@ -50,7 +50,7 @@ public class MapOnly extends Configured implements Tool {
 
         @Override
         public void setup(Context context) throws IOException, InterruptedException {
-            mapFunction = new Function(context.getConfiguration().get(Constants.PARAM_FUNCTION, "long y = x"));
+            mapFunction = new Function(context.getConfiguration().get(Constants.PARAM_FUNCTION, "double y = x"));
         } // setup
 
         @Override
@@ -110,7 +110,7 @@ public class MapOnly extends Configured implements Tool {
         System.out.println("   -libjars target/tidoop-mr-lib-x.y.z-jar-with-dependencies.jar \\");
         System.out.println("   <HDFS input> \\");
         System.out.println("   <HDFS output> \\");
-        System.out.println("   <mapFunction>");
+        System.out.println("   <map function>");
     } // showUsage
     
 } // MapOnly
