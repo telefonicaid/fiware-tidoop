@@ -31,35 +31,82 @@ import org.apache.log4j.Logger;
 public class Function {
     
     private final Logger logger = Logger.getLogger(Function.class);
-    private Interpreter interpreter = null;
-    private final NumericType type;
-    private final String function;
+    private final Interpreter interpreter;
+    private NumericType inputType;
+    private NumericType outputType;
+    private String code;
     
     /**
      * Constructor.
-     * @param functionStr
+     * @param code
      */
-    public Function(String functionStr) {
-        String[] split = functionStr.split(" ", 2);
-        type = getType(split[0]);
-        function = split[1];
-        interpreter = new Interpreter(); // beanshell interpreter for the function
+    public Function(String code) {
+        // create a beanshell interpreter
+        interpreter = new Interpreter();
+        
+        // check if the code is empty
+        if (code.length() == 0) {
+            setToIdentityFunction();
+            return;
+        } // if
+        
+        // get all the code within the string
+        String[] sentences = code.split(";");
+        
+        if (sentences.length == 0) {
+            setToIdentityFunction();
+            return;
+        } // if
+        
+        // trim the sentences
+        for (int i = 0; i < sentences.length; i++) {
+            sentences[i] = sentences[i].trim();
+        } // for
+        
+        // get the input type
+        String[] split = sentences[0].split(" ", 2);
+        
+        if (getType(split[0]) == NumericType.UNKNOWN) {
+            setToIdentityFunction();
+            return;
+        } else {
+            inputType = getType(split[0]);
+        } // if else
+        
+        // get the output type
+        split = sentences[sentences.length - 1].split(" ", 2);
+        
+        if (getType(split[0]) == NumericType.UNKNOWN) {
+            setToIdentityFunction();
+            return;
+        } else {
+            outputType = getType(split[0]);
+        } // if else
+        
+        // set the code to be evaluated
+        this.code = code;
     } // Function
     
+    private void setToIdentityFunction() {
+        inputType = NumericType.STRING;
+        outputType = NumericType.STRING;
+        this.code = "String y = x";
+    } // setToIdentityFunction
+    
     /**
-     * Gets the type of the function.
-     * @return The type of the function
+     * Gets the inputType of the code.
+     * @return The inputType of the code
      */
     public NumericType getType() {
-        return type;
+        return inputType;
     } // getType
     
     /**
-     * Gets the string representation of the function.
-     * @return The string representation of the function
+     * Gets the string representation of the code.
+     * @return The string representation of the code
      */
     public String getFunction() {
-        return function;
+        return code;
     } // getFunction
     
     /**
@@ -69,7 +116,7 @@ public class Function {
      */
     public Text eval(Text x) {
         try {
-            switch (type) {
+            switch (inputType) {
                 case INT:
                     interpreter.set("x", new Integer(x.toString()));
                     break;
@@ -85,14 +132,20 @@ public class Function {
                 case BOOLEAN:
                     interpreter.set("x", Boolean.valueOf(x.toString()));
                     break;
+                case STRING:
+                    interpreter.set("x", x.toString());
+                    break;
                 default:
                     interpreter.set("x", (Object) x);
             } // switch
             
-            interpreter.eval(function);
+            interpreter.eval(code);
             Object y = interpreter.get("y");
             // Object is not HDFS writabe, thus convert it to Text
-            return toText(y, type);
+            return toText(y, outputType);
+        } catch (NumberFormatException e) {
+            logger.error("Error while evaluating the function. Details: " + e.getMessage());
+            return null;
         } catch (EvalError e) {
             logger.error("Error while evaluating the function. Details: " + e.getMessage());
             return null;
@@ -110,6 +163,8 @@ public class Function {
             return NumericType.DOUBLE;
         } else if (typeStr.equals("boolean")) {
             return NumericType.BOOLEAN;
+        } else if (typeStr.equals("String")) {
+            return NumericType.STRING;
         } else {
             return NumericType.UNKNOWN;
         } // if else if
@@ -133,6 +188,8 @@ public class Function {
                 return new Text(((Double) o).toString());
             case BOOLEAN:
                 return new Text(((Boolean) o).toString());
+            case STRING:
+                return new Text((String) o);
             default:
                 return null;
         } // switch
