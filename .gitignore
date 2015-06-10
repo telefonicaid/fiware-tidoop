@@ -3,3 +3,5 @@ target/
 *.idea
 *.iml
 nbactions.xml
+*.log
+node_modules
