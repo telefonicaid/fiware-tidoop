@@ -23,11 +23,12 @@
  * Author: frb
  */
 
+// requires
 var Hapi = require('hapi');
+var config = require('../conf/tidoop-mr-lib-api.json');
 
 // create a server with a host and port
 var server = new Hapi.Server();
-var config = require('../conf/tidoop-mr-lib-api.json');
 
 server.connection({ 
     host: 'localhost',
@@ -48,6 +49,10 @@ server.route({
 });
 
 // start the server
-server.start();
-console.log("tidoop-mr-lib-api running at http://localhost:" + config.port);
+server.start(function(err) {
+    if(err) {
+        return console.log("Some error occurred during the starting of the Hapi server: " + err);
+    }
 
+    console.log("tidoop-mr-lib-api running at http://localhost:" + config.port);
+});
