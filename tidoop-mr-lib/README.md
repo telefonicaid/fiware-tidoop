@@ -19,6 +19,7 @@
     * [Chaining of jobs](#chaining)
 * [Jobs reference (in alphabetical order)](#jobs)
     * [Filter](#filter)
+    * [MapOnly](#maponly)
 * [Contact](#contact)
 
 ##<a name="whatis"></a>What is tidoop-mr-lib
@@ -228,9 +229,71 @@ Usage:
          target/tidoop-mr-lib-x.y.z-jar-with-dependencies.jar \
          com.telefonica.iot.tidoop.mrlib.Filter \
          -libjars target/tidoop-mr-lib-x.y.z-jar-with-dependencies.jar \
-         <input_folder> \
-         <output_folder> \
+         <input folder> \
+         <output folder> \
          <regex>
+         
+Categories: **transformation**, **generic**, **flat**.
+
+[Top](#top)
+
+###<a name="maponly"></a>MapOnly
+Use this job in order to apply a user defined function over all the input data (this is called a <i>map</i>). For instance, assuming a file within the input folder containing this data:
+
+    3
+    12
+    5
+    1.2
+    410
+
+If a mapping function such as `double y = x * x` was defined (`x` gets the value within each line), then the output file would be:
+
+    9.0
+    144.0
+    25.0
+    1.44
+    168100.0
+    
+Nevertheless, if a mapping function such as `int y = x * x` was defined, then the output would change to:
+
+    9
+    144
+    25
+    168100
+    
+This is because `int y = 1.44 * 1.44` is not a valid statement in Java, due to types incompatibility (possible lossy conversion from `double` to `int`). As can be seen, the whole map is not stopped when a single evaluation cannot be done.
+
+Please observe a string function can also be defined (when using string functions no types incompatibility arise since everything is text in HDFS), e.g. `String y = x + "_sufix"`:
+
+    3_sufix
+    12_sufix
+    5_sufix
+    1.2_sufix
+    410_sufix
+
+Even, a sequence of functions can be evaluated. In this case, the first function sets the type of the input data, and its result is stored in a temporal variable; the last function sets the type of the output data and its results is stored in the usual `y` variable. For instance, `double w = x * x; double z = w + 1; String y = z + "_sufix"` will produce the following output data:
+
+    10_sufix
+    145_sufix
+    26_sufix
+    2.44_sufix
+    168101_sufix
+
+Arguments:
+
+* **Input folder**: a HDFS folder containing the input data in the form of one or more files.
+* **Output folder**: a HDFS folder containing the output data in the form of one or more files.
+* **Map function**: a function (or sequence of functions) written in Java language. Its format **must** be `'<type> y = <function of x>;'` (use `'` to enclose the function). The type is needed for checking types compatibility. Supported types from Java are `int`, `long`, `float`, `double`, `boolean` and `String`. If no type is given, or the type is unknown then the identity function (`String y = x`) is used instead. If no function is given or it is not a function of `x`, then the identity function (`String y = x`) is used instead.
+
+Usage:
+
+    $ hadoop jar \
+         target/tidoop-mr-lib-x.y.z-jar-with-dependencies.jar \
+         com.telefonica.iot.tidoop.mrlib.MapOnly \
+         -libjars target/tidoop-mr-lib-x.y.z-jar-with-dependencies.jar \
+         <input folder> \
+         <output folder> \
+         <map function>
          
 Categories: **transformation**, **generic**, **flat**.
 

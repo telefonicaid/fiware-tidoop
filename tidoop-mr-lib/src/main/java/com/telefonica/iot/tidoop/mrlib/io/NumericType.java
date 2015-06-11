@@ -16,22 +16,14 @@
  * For those usages not covered by the GNU Affero General Public License please contact with
  * francisco.romerobueno at telefonica dot com
  */
-package com.telefonica.iot.tidoop.mrlib.utils;
+package com.telefonica.iot.tidoop.mrlib.io;
 
 /**
- * Constants across the project.
- * 
+ *
  * @author frb
  */
-public final class Constants {
     
-    /**
-     * Constructor. It is private since utility classes should not have a public constructor.
-     */
-    private Constants() {
-    } // Constants
-    
-    public static final String PARAM_REGEX = "param_regex";
-    public static final String PARAM_FUNCTION = "param_function";
-    
-} // Constants
+/**
+ * Enum about Tidoop types.
+ */
+public enum NumericType { INT, LONG, FLOAT, DOUBLE, BOOLEAN, STRING, UNKNOWN }
