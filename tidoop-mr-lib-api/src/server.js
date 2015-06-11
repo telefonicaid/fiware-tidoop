@@ -26,6 +26,7 @@
 // requires
 var Hapi = require('hapi');
 var config = require('../conf/tidoop-mr-lib-api.json');
+var pjson = require('../package.json');
 
 // create a server with a host and port
 var server = new Hapi.Server();
@@ -40,8 +41,7 @@ server.route({
     method: 'GET',
     path:'/version',
     handler: function (request, reply) {
-        console.log("Request: GET /version")
-        var pjson = require('../package.json');
+        console.log("Request: GET /version");
         var response = '{version: ' + pjson.version + '}';
         console.log("Response: " + response);
         reply(response);
