@@ -23,10 +23,16 @@
  * Author: frb
  */
 
-// requires
+// module dependencies
 var Hapi = require('hapi');
+var spawn = require('child_process').spawn;
+
+// file imports
 var config = require('../conf/tidoop-mr-lib-api.json');
 var pjson = require('../package.json');
+
+// other globals
+var tidoopMRLibPath = config.tidoopMRLibPath;
 
 // create a server with a host and port
 var server = new Hapi.Server();
@@ -36,23 +42,54 @@ server.connection({
     port: config.port
 });
 
-// add the route
+// add routes
 server.route({
     method: 'GET',
-    path:'/version',
+    path: '/version',
     handler: function (request, reply) {
         console.log("Request: GET /version");
-        var response = '{version: ' + pjson.version + '}';
+        var response = '{version: ' + pjson.version + '}\n';
         console.log("Response: " + response);
         reply(response);
-    }
+    } // handler
+});
+
+server.route({
+    method: 'POST',
+    path: '/tidoop/v1/filter',
+    handler: function (request, reply) {
+        // get the request parameters
+        var input = request.query.input;
+        var output = request.query.output;
+        var regex = request.query.regex;
+        console.log('Request: POST /tidoop/v1/filter?' +
+            'input=' + input + '&output=' + output + '&regex=' + regex);
+
+        // run the Filter MR job
+        var job = spawn('hadoop jar ' + tidoopMRLibPath +
+            ' com.telefonica.iot.tidoop.mrlib.Filter' +
+            ' -libjars ' + tidoopMRLibPath,
+            [input, output, regex]);
+        var jobId = 12345;
+
+        // create the response
+        var response = '{job_name: filter, parameters: {' +
+            'input: ' + input + ', ' +
+            'output: ' + output + ', ' +
+            'regex: ' + regex + '}, ' +
+            'job_id: ' + jobId + '}\n';
+        console.log("Response: " + response);
+
+        // return the response
+        reply(response);
+    } // handler
 });
 
 // start the server
 server.start(function(err) {
     if(err) {
         return console.log("Some error occurred during the starting of the Hapi server: " + err);
-    }
+    } // if
 
     console.log("tidoop-mr-lib-api running at http://localhost:" + config.port);
 });
