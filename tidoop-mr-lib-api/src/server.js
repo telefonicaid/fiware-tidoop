@@ -25,21 +25,17 @@
 
 // module dependencies
 var Hapi = require('hapi');
-var spawn = require('child_process').spawn;
-
-// file imports
-var config = require('../conf/tidoop-mr-lib-api.json');
-var pjson = require('../package.json');
-
-// other globals
-var tidoopMRLibPath = config.tidoopMRLibPath;
+var run = require('./cmd_runner.js').run;
+var version = require('../package.json').version;
+var port = require('../conf/tidoop-mr-lib-api.json').port;
+var tidoopMRLibPath = require('../conf/tidoop-mr-lib-api.json').tidoopMRLibPath;
 
 // create a server with a host and port
 var server = new Hapi.Server();
 
 server.connection({ 
     host: 'localhost',
-    port: config.port
+    port: port
 });
 
 // add routes
@@ -48,7 +44,7 @@ server.route({
     path: '/version',
     handler: function (request, reply) {
         console.log("Request: GET /version");
-        var response = '{version: ' + pjson.version + '}\n';
+        var response = '{version: ' + version + '}\n';
         console.log("Response: " + response);
         reply(response);
     } // handler
@@ -63,17 +59,25 @@ server.route({
         var output = request.query.output;
         var regex = request.query.regex;
         console.log('Request: POST /tidoop/v1/filter?' +
-            'input=' + input + '&output=' + output + '&regex=' + regex);
+            'input=' + input +
+            '&output=' + output +
+            '&regex=' + regex);
 
         // run the Filter MR job
-        var job = spawn('hadoop jar ' + tidoopMRLibPath +
-            ' com.telefonica.iot.tidoop.mrlib.Filter' +
-            ' -libjars ' + tidoopMRLibPath,
-            [input, output, regex]);
+        run('hadoop',
+            ['jar', tidoopMRLibPath,
+            'com.telefonica.iot.tidoop.mrlib.Filter',
+            '-libjars', tidoopMRLibPath,
+            input, output, regex],
+            function(result) {
+                console.log(result);
+            }
+        );
         var jobId = 12345;
 
         // create the response
-        var response = '{job_name: filter, parameters: {' +
+        var response = '{job_name: filter,' +
+            'parameters: {' +
             'input: ' + input + ', ' +
             'output: ' + output + ', ' +
             'regex: ' + regex + '}, ' +
@@ -91,5 +95,5 @@ server.start(function(err) {
         return console.log("Some error occurred during the starting of the Hapi server: " + err);
     } // if
 
-    console.log("tidoop-mr-lib-api running at http://localhost:" + config.port);
+    console.log("tidoop-mr-lib-api running at http://localhost:" + port);
 });
