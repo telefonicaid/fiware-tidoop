@@ -1,3 +1,4 @@
 {
-  "port": 6060
+  "port": 6060,
+  "tidoopMRLibPath": "path/to/tidoop-mr-lib"
 }
