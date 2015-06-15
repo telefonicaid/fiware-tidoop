@@ -25,9 +25,10 @@
 
 // module dependencies
 var spawn = require('child_process').spawn;
+var mysqlDriver = require('./mysql_driver.js');
 
 module.exports = {
-    run: function (cmd, params, callback) {
+    run: function (jobId, cmd, params, callback) {
         var job = spawn(cmd, params);
         var result = '';
 
@@ -37,6 +38,18 @@ module.exports = {
 
         job.stderr.on('data', function (data) {
             result += 'stderr: ' + data.toString();
+            var dataStr = data.toString();
+            var indexOfMap = dataStr.indexOf('map');
+            var indexOfReduce = dataStr.indeOx('reduce');
+            var indexFirstPercentage = dataStr.indexOf('%');
+            var indexSecondPercentage = dataStr.lastIndexOf('%');
+
+            if(indexOfMap >= 0 && indexOfReduce >= 0 && indexFirstPercentage >= 0 && indexSecondPercentage >= 0) {
+                var mapProgress = dataStr.substring(indexOfMap + 4, indexFirstPercentage);
+                var reduceProgress = dataStr.substring(indexOfReduce + 7, indexSecondPercentage);
+                var connection = mysqlDriver.connect();
+                mysqlDriver.updateJobStatus(jobId, mapProgress, reduceProgress);
+            } // if
         });
 
         job.on('close', function (code) {

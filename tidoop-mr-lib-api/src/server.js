@@ -29,6 +29,7 @@ var run = require('./cmd_runner.js').run;
 var version = require('../package.json').version;
 var port = require('../conf/tidoop-mr-lib-api.json').port;
 var tidoopMRLibPath = require('../conf/tidoop-mr-lib-api.json').tidoopMRLibPath;
+var tidoopMysql = require('./mysql_driver.js');
 
 // create a server with a host and port
 var server = new Hapi.Server();
@@ -63,8 +64,18 @@ server.route({
             '&output=' + output +
             '&regex=' + regex);
 
-        // run the Filter MR job
-        run('hadoop',
+        // check the request parameters
+
+        // create a jobId
+        var jobId = 'tidoop_job_' + Date.now();
+
+        // create a new job entry in the database
+        tidoopMysql.connect();
+        tidoopMysql.addNewJob('filter', jobId);
+
+        // run the Filter MR job; the callback function will receive the complete output once it finishes
+        run(jobId,
+            'hadoop',
             ['jar', tidoopMRLibPath,
             'com.telefonica.iot.tidoop.mrlib.Filter',
             '-libjars', tidoopMRLibPath,
@@ -73,10 +84,9 @@ server.route({
                 console.log(result);
             }
         );
-        var jobId = 12345;
 
         // create the response
-        var response = '{job_name: filter,' +
+        var response = '{job_type: filter, ' +
             'parameters: {' +
             'input: ' + input + ', ' +
             'output: ' + output + ', ' +
