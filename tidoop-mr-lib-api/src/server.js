@@ -74,7 +74,7 @@ server.route({
         var jobId = 'tidoop_job_' + Date.now();
 
         // create a new job entry in the database
-        tidoopMysql.addNewJob(jobId, jobType, function(error, result) {
+        tidoopMysql.addNewJob(jobId, 'filter', function(error, result) {
             if (error) {
                 console.log('The new job could not be added to the database. Details: ' + err);
             } else {
