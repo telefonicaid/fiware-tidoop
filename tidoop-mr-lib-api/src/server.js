@@ -71,31 +71,35 @@ server.route({
 
         // create a new job entry in the database
         tidoopMysql.connect();
-        tidoopMysql.addNewJob(jobId, 'filter');
+        tidoopMysql.addNewJob(jobId, 'filter', function(error, result) {
+            if (error) {
+                console.log('The new job could not be added to the database. Details: ' + err);
+            } else {
+                // run the Filter MR job; the callback function will receive the complete output once it finishes
+                run(jobId,
+                    'hadoop',
+                    ['jar', tidoopMRLibPath,
+                    'com.telefonica.iot.tidoop.mrlib.Filter',
+                    '-libjars', tidoopMRLibPath,
+                    input, output, regex],
+                    function(result) {
+                        console.log(result);
+                    }
+                );
 
-        // run the Filter MR job; the callback function will receive the complete output once it finishes
-        run(jobId,
-            'hadoop',
-            ['jar', tidoopMRLibPath,
-            'com.telefonica.iot.tidoop.mrlib.Filter',
-            '-libjars', tidoopMRLibPath,
-            input, output, regex],
-            function(result) {
-                console.log(result);
+                // create the response
+                var response = '{job_type: filter, ' +
+                    'parameters: {' +
+                    'input: ' + input + ', ' +
+                    'output: ' + output + ', ' +
+                    'regex: ' + regex + '}, ' +
+                    'job_id: ' + jobId + '}\n';
+                console.log("Response: " + response);
+
+                // return the response
+                reply(response);
             }
-        );
-
-        // create the response
-        var response = '{job_type: filter, ' +
-            'parameters: {' +
-            'input: ' + input + ', ' +
-            'output: ' + output + ', ' +
-            'regex: ' + regex + '}, ' +
-            'job_id: ' + jobId + '}\n';
-        console.log("Response: " + response);
-
-        // return the response
-        reply(response);
+        });
     } // handler
 });
 
@@ -105,28 +109,31 @@ server.route({
     handler: function (request, reply) {
         // get the request parameters
         var jobId = request.query.jobId;
-        console.log('Request: GET /tidoop/v1/jobStatus?' +
-            'jobId=' + jobId);
+        console.log('Request: GET /tidoop/v1/jobStatus?' + 'jobId=' + jobId);
 
         // check the request parameters
 
         // get the job status
-        var result = tidoopMysql.addNewJob(jobId, 'filter');
+        var result = tidoopMysql.getJobStatus(jobId, function (error, result) {
+            if (error) {
+                throw error;
+            } else {
+                // create the response
+                var response = '{job_id: ' + jobId + ', map_progress: ' + result[0].mapProgress +
+                    ', reduce_progress: ' + result[0].reduceProgress + '}\n';
+                console.log("Response: " + response);
 
-        // create the response
-        var response = '{job_id: ' + jobId + ', map_progress: ' + result[0].mapProgress +
-            ', reduce_progress: ' + result[0].reduceProgress + '}\n';
-        console.log("Response: " + response);
-
-        // return the response
-        reply(response);
+                // return the response
+                reply(response);
+            } // if else
+        });
     } // handler
 });
 
 // start the server
-server.start(function(err) {
-    if(err) {
-        return console.log("Some error occurred during the starting of the Hapi server: " + err);
+server.start(function(error) {
+    if(error) {
+        return console.log("Some error occurred during the starting of the Hapi server. Details: " + error);
     } // if
 
     console.log("tidoop-mr-lib-api running at http://localhost:" + port);

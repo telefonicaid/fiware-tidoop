@@ -47,7 +47,11 @@ module.exports = {
             if(indexOfMap >= 0 && indexOfReduce >= 0 && indexFirstPercentage >= 0 && indexSecondPercentage >= 0) {
                 var mapProgress = dataStr.substring(indexOfMap + 4, indexFirstPercentage);
                 var reduceProgress = dataStr.substring(indexOfReduce + 7, indexSecondPercentage);
-                mysqlDriver.updateJobStatus(jobId, mapProgress, reduceProgress);
+                mysqlDriver.updateJobStatus(jobId, mapProgress, reduceProgress, function (error, result) {
+                    if (error) {
+                        console.log(error);
+                    } // if
+                });
             } // if
         });
 

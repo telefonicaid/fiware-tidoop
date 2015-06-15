@@ -47,39 +47,41 @@ module.exports = {
             } else {
                 console.log('Connected to http://' + host + ':' + port + '/' + database);
                 return connection;
-            }
+            } // if else
         });
     }, // connect
 
-    addNewJob: function (jobId, jobType) {
+    addNewJob: function (jobId, jobType, callback) {
         var query = connection.query(
             'INSERT INTO tidoop_job (jobId, jobType, startTime, mapProgress, reduceProgress) ' +
             'VALUES (?, ?, NOW(), ?, ?)',
             [jobId, jobType, 0, 0],
             function (error, result) {
                 if (error) {
-                    throw error;
+                    callback(error)
                 } else {
                     console.log('Successful insert: \'INSERT INTO tidoop_job ' +
                         '(jobId, jobType, startTime, mapProgress, reduceProgress) VALUES' +
                         '(' + jobId + ', ' + jobType + ', NOW(), 0, 0)\'');
+                    callback(null, result);
                 } // if else
             }
         );
     }, // addJob
 
-    updateJobStatus: function (jobId, mapProgress, reduceProgress) {
+    updateJobStatus: function (jobId, mapProgress, reduceProgress, callback) {
         if (mapProgress == 100 && reduceProgress == 100) {
             var query = connection.query(
                 'UPDATE tidoop_job SET endTime=NOW(), mapProgress=?, reduceProgress=? WHERE jobId=\'' + jobId + '\'',
                 [mapProgress, reduceProgress],
                 function (error, result) {
                     if (error) {
-                        throw error;
+                        callback(error);
                     } else {
                         console.log('Successful update: \'UPDATE tidoop_job ' +
                             'SET endTime=NOW(), mapProgress=' + mapProgress + ', reduceProgress=' +
                             reduceProgress + ' WHERE jobId=\'' + jobId + '\'\'');
+                        callback(null, result);
                     } // if else
                 }
             );
@@ -89,31 +91,32 @@ module.exports = {
                 [mapProgress, reduceProgress],
                 function (error, result) {
                     if (error) {
-                        throw error;
+                        callback(error);
                     } else {
                         console.log('Successful update: \'UPDATE tidoop_job ' +
                             'SET mapProgress=' + mapProgress + ', reduceProgress=' + reduceProgress +
                             ' WHERE jobId=\'' + jobId + '\'\'');
+                        callback(null, result);
                     } // if else
                 }
             );
-        }
+        } // if else
     }, // updateJobStatus
 
-    getStatus: function (jobId) {
+    getJobStatus: function (jobId, callback, callback) {
         var query = connection.query(
-            'SELECT mapProgress, reduceProgrss from tidoop_job WHERE jobId=\'' + jobId + '\'',
+            'SELECT mapProgress, reduceProgress from tidoop_job WHERE jobId=\'' + jobId + '\'',
             function (error, result) {
                 if (error) {
-                    throw error;
+                    callback(error);
                 } else {
-                    console.log('Successful select: \'SELECT mapProgrss, reduceProgress from tidoop_job ' +
+                    console.log('Successful select: \'SELECT mapProgress, reduceProgress from tidoop_job ' +
                         'WHERE jobId=\'' + jobId + '\'\'');
-                    return result;
+                    callback(null, result);
                 } // if else
             }
         );
-    }, // getStatus
+    }, // getJobStatus
 
     exists: function (username, password) {
         var query = connection.query(
