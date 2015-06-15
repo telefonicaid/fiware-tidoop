@@ -99,6 +99,30 @@ server.route({
     } // handler
 });
 
+server.route({
+    method: 'GET',
+    path: '/tidoop/v1/jobStatus',
+    handler: function (request, reply) {
+        // get the request parameters
+        var jobId = request.query.jobId;
+        console.log('Request: GET /tidoop/v1/jobStatus?' +
+            'jobId=' + jobId);
+
+        // check the request parameters
+
+        // get the job status
+        var result = tidoopMysql.addNewJob(jobId, 'filter');
+
+        // create the response
+        var response = '{job_id: ' + jobId + ', map_progress: ' + result[0].mapProgress +
+            ', reduce_progress: ' + result[0].reduceProgress + '}\n';
+        console.log("Response: " + response);
+
+        // return the response
+        reply(response);
+    } // handler
+});
+
 // start the server
 server.start(function(err) {
     if(err) {
