@@ -1,0 +1,5 @@
+DROP DATABASE cosmos_gui;
+CREATE DATABASE cosmos_gui;
+USE cosmos_gui;
+
+CREATE TABLE tidoop_job (jobType TEXT NOT NULL, jobId VARCHAR(24) NOT NULL PRIMARY KEY UNIQUE, mapProgress INT NOT NULL DEFAULT '0', reduceProgress INT NOT NULL DEFAULT '0');
