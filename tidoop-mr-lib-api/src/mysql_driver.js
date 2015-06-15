@@ -51,36 +51,54 @@ module.exports = {
         });
     }, // connect
 
-    addNewJob: function (jobType, jobId) {
+    addNewJob: function (jobId, jobType) {
+        var ts = Date.now();
         var query = connection.query(
-            'INSERT INTO tidoop_job (jobType, jobId, mapProgress, reduceProgress) VALUES (?, ?, ?, ?)',
-            [jobType, jobId, 0, 0],
+            'INSERT INTO tidoop_job (jobId, jobType, startTime, endTime, mapProgress, reduceProgress) ' +
+            'VALUES (?, ?, ?, ?, ?, ?)',
+            [jobId, jobType, ts, NULL, 0, 0],
             function (error, result) {
                 if (error) {
                     throw error;
                 } else {
                     console.log('Successful insert: \'INSERT INTO tidoop_job ' +
-                        '(jobType, jobId, mapProgress, reduceProgress) VALUES' +
-                        '(' + jobType + ', ' + jobId + ', 0, 0)\'');
+                        '(jobId, jobType, startTime, endTime, mapProgress, reduceProgress) VALUES' +
+                        '(' + jobType + ', ' + jobId + ', ' + ts + ', NULL, 0, 0)\'');
                 } // if else
             }
         );
     }, // addJob
 
     updateJobStatus: function (jobId, mapProgress, reduceProgress) {
-        var query = connection.query(
-            'UPDATE tidoop_job SET mapProgress=?, reduceProgress=? WHERE jobId=\'' + jobId + '\'',
-            [mapProgress, reduceProgress],
-            function (error, result) {
-                if (error) {
-                    throw error;
-                } else {
-                    console.log('Successful update: \'UPDATE tidoop_job ' +
-                        'SET mapProgress=' + mapProgress + ', reduceProgress=' + reduceProgress +
-                        ' WHERE jobId=\'' + jobId + '\'\'');
-                } // if else
-            }
-        );
+        if (mapProgress == 100 && reduceProgress == 100) {
+            var query = connection.query(
+                'UPDATE tidoop_job SET endTime=?, mapProgress=?, reduceProgress=? WHERE jobId=\'' + jobId + '\'',
+                [Date.now(), mapProgress, reduceProgress],
+                function (error, result) {
+                    if (error) {
+                        throw error;
+                    } else {
+                        console.log('Successful update: \'UPDATE tidoop_job ' +
+                            'SET mapProgress=' + mapProgress + ', reduceProgress=' + reduceProgress +
+                            ' WHERE jobId=\'' + jobId + '\'\'');
+                    } // if else
+                }
+            );
+        } else {
+            var query = connection.query(
+                'UPDATE tidoop_job SET mapProgress=?, reduceProgress=? WHERE jobId=\'' + jobId + '\'',
+                [mapProgress, reduceProgress],
+                function (error, result) {
+                    if (error) {
+                        throw error;
+                    } else {
+                        console.log('Successful update: \'UPDATE tidoop_job ' +
+                            'SET mapProgress=' + mapProgress + ', reduceProgress=' + reduceProgress +
+                            ' WHERE jobId=\'' + jobId + '\'\'');
+                    } // if else
+                }
+            );
+        }
     }, // updateJobStatus
 
     getStatus: function (jobId) {

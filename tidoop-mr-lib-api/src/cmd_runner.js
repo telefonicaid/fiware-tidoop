@@ -39,15 +39,14 @@ module.exports = {
         job.stderr.on('data', function (data) {
             result += 'stderr: ' + data.toString();
             var dataStr = data.toString();
-            var indexOfMap = dataStr.indexOf('map');
-            var indexOfReduce = dataStr.indeOx('reduce');
+            var indexOfMap = dataStr.indexOf('map ');
+            var indexOfReduce = dataStr.indexOf('reduce ');
             var indexFirstPercentage = dataStr.indexOf('%');
             var indexSecondPercentage = dataStr.lastIndexOf('%');
 
             if(indexOfMap >= 0 && indexOfReduce >= 0 && indexFirstPercentage >= 0 && indexSecondPercentage >= 0) {
                 var mapProgress = dataStr.substring(indexOfMap + 4, indexFirstPercentage);
                 var reduceProgress = dataStr.substring(indexOfReduce + 7, indexSecondPercentage);
-                var connection = mysqlDriver.connect();
                 mysqlDriver.updateJobStatus(jobId, mapProgress, reduceProgress);
             } // if
         });

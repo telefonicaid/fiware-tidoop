@@ -71,7 +71,7 @@ server.route({
 
         // create a new job entry in the database
         tidoopMysql.connect();
-        tidoopMysql.addNewJob('filter', jobId);
+        tidoopMysql.addNewJob(jobId, 'filter');
 
         // run the Filter MR job; the callback function will receive the complete output once it finishes
         run(jobId,
