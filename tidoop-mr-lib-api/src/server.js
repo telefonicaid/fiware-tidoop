@@ -39,6 +39,9 @@ server.connection({
     port: port
 });
 
+// create a connection to the MySQL server
+tidoopMysql.connect();
+
 // add routes
 server.route({
     method: 'GET',
@@ -53,13 +56,14 @@ server.route({
 
 server.route({
     method: 'POST',
-    path: '/tidoop/v1/filter',
+    path: '/tidoop/v1/job/run/filter',
     handler: function (request, reply) {
         // get the request parameters
         var input = request.query.input;
         var output = request.query.output;
         var regex = request.query.regex;
-        console.log('Request: POST /tidoop/v1/filter?' +
+
+        console.log('Request: POST /tidoop/v1/job/run/filter?' +
             'input=' + input +
             '&output=' + output +
             '&regex=' + regex);
@@ -70,8 +74,7 @@ server.route({
         var jobId = 'tidoop_job_' + Date.now();
 
         // create a new job entry in the database
-        tidoopMysql.connect();
-        tidoopMysql.addNewJob(jobId, 'filter', function(error, result) {
+        tidoopMysql.addNewJob(jobId, jobType, function(error, result) {
             if (error) {
                 console.log('The new job could not be added to the database. Details: ' + err);
             } else {
@@ -105,11 +108,11 @@ server.route({
 
 server.route({
     method: 'GET',
-    path: '/tidoop/v1/jobStatus',
+    path: '/tidoop/v1/job/status',
     handler: function (request, reply) {
         // get the request parameters
         var jobId = request.query.jobId;
-        console.log('Request: GET /tidoop/v1/jobStatus?' + 'jobId=' + jobId);
+        console.log('Request: GET /tidoop/v1/job/status?' + 'jobId=' + jobId);
 
         // check the request parameters
 

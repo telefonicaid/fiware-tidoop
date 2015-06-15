@@ -103,7 +103,7 @@ module.exports = {
         } // if else
     }, // updateJobStatus
 
-    getJobStatus: function (jobId, callback, callback) {
+    getJobStatus: function (jobId, callback) {
         var query = connection.query(
             'SELECT mapProgress, reduceProgress from tidoop_job WHERE jobId=\'' + jobId + '\'',
             function (error, result) {
@@ -117,25 +117,6 @@ module.exports = {
             }
         );
     }, // getJobStatus
-
-    exists: function (username, password) {
-        var query = connection.query(
-            'SELECT count(*) FROM user where fiware_username=? and fiware_password=?',
-            [username, password],
-            function (error, result) {
-                if (error) {
-                    throw error;
-                } else {
-                    if (result.length > 0) {
-                        console.log("Cosmos user already stored in the database");
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            }
-        );
-    }, // exists
 
     close: function(connection) {
         connection.end();
