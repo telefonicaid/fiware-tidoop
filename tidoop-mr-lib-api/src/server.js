@@ -30,6 +30,7 @@ var version = require('../package.json').version;
 var port = require('../conf/tidoop-mr-lib-api.json').port;
 var tidoopMRLibPath = require('../conf/tidoop-mr-lib-api.json').tidoopMRLibPath;
 var tidoopMysql = require('./mysql_driver.js');
+var serverUtils = require('./server_utils.js');
 
 // create a server with a host and port
 var server = new Hapi.Server();
@@ -45,36 +46,41 @@ tidoopMysql.connect();
 // add routes
 server.route({
     method: 'GET',
-    path: '/version',
+    path: '/tidoop/v1/version',
     handler: function (request, reply) {
-        console.log("Request: GET /version");
-        var response = '{version: ' + version + '}\n';
+        console.log("Request: GET /tidoop/v1/version");
+        var response = '{version: ' + version + '}';
         console.log("Response: " + response);
         reply(response);
     } // handler
 });
 
 server.route({
-    method: 'POST',
-    path: '/tidoop/v1/job/run/filter',
-    handler: function (request, reply) {
-        // get the request parameters
-        var input = request.query.input;
-        var output = request.query.output;
-        var regex = request.query.regex;
+    method: 'GET',
+    path: '/tidoop/v1/jobs/',
+    handler: function(request, reply) {
+        console.log('Request: GET /tidoop/v1/jobs/');
+        throw new Error('Unsupported operation');
+    } // handler
+});
 
-        console.log('Request: POST /tidoop/v1/job/run/filter?' +
-            'input=' + input +
-            '&output=' + output +
-            '&regex=' + regex);
+server.route({
+    method: 'POST',
+    path: '/tidoop/v1/jobs/',
+    handler: function (request, reply) {
+        console.log('Request: POST /tidoop/v1/jobs/ ' + JSON.stringify(request.payload));
 
         // check the request parameters
+        // TBD
+
+        // get the jobType
+        var jobType = request.payload.job_type;
 
         // create a jobId
         var jobId = 'tidoop_job_' + Date.now();
 
         // create a new job entry in the database
-        tidoopMysql.addNewJob(jobId, 'filter', function(error, result) {
+        tidoopMysql.addNewJob(jobId, jobType, function(error, result) {
             if (error) {
                 console.log('The new job could not be added to the database. Details: ' + err);
             } else {
@@ -82,21 +88,16 @@ server.route({
                 run(jobId,
                     'hadoop',
                     ['jar', tidoopMRLibPath,
-                    'com.telefonica.iot.tidoop.mrlib.Filter',
-                    '-libjars', tidoopMRLibPath,
-                    input, output, regex],
+                    serverUtils.getMRJobByType(jobType),
+                    '-libjars', tidoopMRLibPath].concat(
+                        serverUtils.getParamsForMRJob(jobType, request.payload)),
                     function(result) {
                         console.log(result);
                     }
                 );
 
                 // create the response
-                var response = '{job_type: filter, ' +
-                    'parameters: {' +
-                    'input: ' + input + ', ' +
-                    'output: ' + output + ', ' +
-                    'regex: ' + regex + '}, ' +
-                    'job_id: ' + jobId + '}\n';
+                var response = '{job_id: ' + jobId + '}';
                 console.log("Response: " + response);
 
                 // return the response
@@ -108,13 +109,15 @@ server.route({
 
 server.route({
     method: 'GET',
-    path: '/tidoop/v1/job/status',
+    path: '/tidoop/v1/jobs/{jobId?}',
     handler: function (request, reply) {
-        // get the request parameters
-        var jobId = request.query.jobId;
-        console.log('Request: GET /tidoop/v1/job/status?' + 'jobId=' + jobId);
+        console.log('Request: GET /tidoop/v1/jobs/' + request.params.jobId + '/');
 
         // check the request parameters
+        // TBD
+
+        // get the jobId
+        var jobId = request.params.jobId;
 
         // get the job status
         var result = tidoopMysql.getJobStatus(jobId, function (error, result) {
@@ -123,13 +126,22 @@ server.route({
             } else {
                 // create the response
                 var response = '{job_id: ' + jobId + ', map_progress: ' + result[0].mapProgress +
-                    ', reduce_progress: ' + result[0].reduceProgress + '}\n';
+                    ', reduce_progress: ' + result[0].reduceProgress + '}';
                 console.log("Response: " + response);
 
                 // return the response
                 reply(response);
             } // if else
         });
+    } // handler
+});
+
+server.route({
+    method: 'DELETE',
+    path: '/tidoop/v1/jobs/{jobId?}',
+    handler: function(request, reply) {
+        console.log('Request: DELETE /tidoop/v1/jobs/' + request.params.jobId + '/');
+        throw new Error('Unsupported operation');
     } // handler
 });
 
