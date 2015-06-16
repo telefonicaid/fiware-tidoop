@@ -62,7 +62,7 @@ tidoop-mr-lib-api typically listens in the TCP/6060 port, but you can change if 
 [Top](#top)
 
 ##<a name="usage"></a>Usage
-To be done.
+Please refer to this [Apiary](http://docs.tidoopmrlibapi.apiary.io/#) documentation.
 
 [Top](#top)
 
