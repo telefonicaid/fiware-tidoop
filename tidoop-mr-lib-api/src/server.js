@@ -120,13 +120,14 @@ server.route({
         var jobId = request.params.jobId;
 
         // get the job status
-        var result = tidoopMysql.getJobStatus(jobId, function (error, result) {
+        var result = tidoopMysql.getJob(jobId, function (error, result) {
             if (error) {
                 throw error;
             } else {
                 // create the response
-                var response = '{job_id: ' + jobId + ', map_progress: ' + result[0].mapProgress +
-                    ', reduce_progress: ' + result[0].reduceProgress + '}';
+                var response = '{job_id: ' + jobId + ', job_type: ' + result[0].jobType + ', start_time: ' +
+                    result[0].startTime + ', end_time: ' + result[0].endTime + ', map_progress: ' +
+                    result[0].mapProgress + ', reduce_progress: ' + result[0].reduceProgress + '}';
                 console.log("Response: " + response);
 
                 // return the response

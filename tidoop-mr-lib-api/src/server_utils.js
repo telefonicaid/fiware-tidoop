@@ -38,7 +38,7 @@ module.exports = {
         var params = [];
 
         if (jobType === 'filter') {
-            returnparams.push(payload.input);
+            params.push(payload.input);
             params.push(payload.output);
             params.push(payload.regex);
         } else if (jobType === 'map_only') {

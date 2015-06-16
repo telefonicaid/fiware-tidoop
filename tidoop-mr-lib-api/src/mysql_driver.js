@@ -103,15 +103,14 @@ module.exports = {
         } // if else
     }, // updateJobStatus
 
-    getJobStatus: function (jobId, callback) {
+    getJob: function (jobId, callback) {
         var query = connection.query(
-            'SELECT mapProgress, reduceProgress from tidoop_job WHERE jobId=\'' + jobId + '\'',
+            'SELECT * from tidoop_job WHERE jobId=\'' + jobId + '\'',
             function (error, result) {
                 if (error) {
                     callback(error);
                 } else {
-                    console.log('Successful select: \'SELECT mapProgress, reduceProgress from tidoop_job ' +
-                        'WHERE jobId=\'' + jobId + '\'\'');
+                    console.log('Successful select: \'SELECT * from tidoop_job WHERE jobId=\'' + jobId + '\'\'');
                     callback(null, result);
                 } // if else
             }
