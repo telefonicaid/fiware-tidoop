@@ -23,33 +23,30 @@
  * Author: frb
  */
 
-// module dependencies
+// Module dependencies
 var Hapi = require('hapi');
-var run = require('./cmd_runner.js').run;
-var version = require('../package.json').version;
-var port = require('../conf/tidoop-mr-lib-api.json').port;
-var tidoopMRLibPath = require('../conf/tidoop-mr-lib-api.json').tidoopMRLibPath;
-var tidoopMysql = require('./mysql_driver.js');
+var boom = require('boom');
+var cmdRunner = require('./cmd_runner.js');
+var packageJson = require('../package.json');
+var config = require('../conf/tidoop-mr-lib-api.json');
+var mysqlDriver = require('./mysql_driver.js');
 var serverUtils = require('./server_utils.js');
 
-// create a server with a host and port
+// Create a Hapi server with a host and port
 var server = new Hapi.Server();
 
 server.connection({ 
     host: 'localhost',
-    port: port
+    port: config.port
 });
 
-// create a connection to the MySQL server
-tidoopMysql.connect();
-
-// add routes
+// Add routes
 server.route({
     method: 'GET',
     path: '/tidoop/v1/version',
     handler: function (request, reply) {
         console.log("Request: GET /tidoop/v1/version");
-        var response = '{version: ' + version + '}';
+        var response = '{version: ' + packageJson.version + '}';
         console.log("Response: " + response);
         reply(response);
     } // handler
@@ -60,7 +57,7 @@ server.route({
     path: '/tidoop/v1/jobs/',
     handler: function(request, reply) {
         console.log('Request: GET /tidoop/v1/jobs/');
-        throw new Error('Unsupported operation');
+        reply(boom.notImplemented('Unsupported operation'));
     } // handler
 });
 
@@ -70,37 +67,37 @@ server.route({
     handler: function (request, reply) {
         console.log('Request: POST /tidoop/v1/jobs/ ' + JSON.stringify(request.payload));
 
-        // check the request parameters
+        // Check the request parameters
         // TBD
 
-        // get the jobType
+        // Get the jobType
         var jobType = request.payload.job_type;
 
-        // create a jobId
+        // Create a jobId
         var jobId = 'tidoop_job_' + Date.now();
 
-        // create a new job entry in the database
-        tidoopMysql.addNewJob(jobId, jobType, function(error, result) {
+        // Create a new job entry in the database
+        mysqlDriver.addJob(jobId, jobType, function(error, result) {
             if (error) {
-                console.log('The new job could not be added to the database. Details: ' + err);
+                reply(boom.internal('The new job could not be added to the database', error));
             } else {
-                // run the Filter MR job; the callback function will receive the complete output once it finishes
-                run(jobId,
+                // Run the Filter MR job; the callback function will receive the complete output once it finishes
+                cmdRunner.run(jobId,
                     'hadoop',
-                    ['jar', tidoopMRLibPath,
+                    ['jar', config.tidoopMRLibPath,
                     serverUtils.getMRJobByType(jobType),
-                    '-libjars', tidoopMRLibPath].concat(
+                    '-libjars', config.tidoopMRLibPath].concat(
                         serverUtils.getParamsForMRJob(jobType, request.payload)),
                     function(result) {
                         console.log(result);
                     }
                 );
 
-                // create the response
+                // Create the response
                 var response = '{job_id: ' + jobId + '}';
                 console.log("Response: " + response);
 
-                // return the response
+                // Return the response
                 reply(response);
             }
         });
@@ -109,29 +106,31 @@ server.route({
 
 server.route({
     method: 'GET',
-    path: '/tidoop/v1/jobs/{jobId?}',
+    path: '/tidoop/v1/jobs/{jobId}',
     handler: function (request, reply) {
         console.log('Request: GET /tidoop/v1/jobs/' + request.params.jobId + '/');
 
-        // check the request parameters
+        // Check the request parameters
         // TBD
 
-        // get the jobId
+        // Get the jobId
         var jobId = request.params.jobId;
 
-        // get the job status
-        var result = tidoopMysql.getJob(jobId, function (error, result) {
+        // Get the job status
+        var result = mysqlDriver.getJob(jobId, function (error, result) {
             if (error) {
-                throw error;
-            } else {
-                // create the response
+                reply(boom.internal('Could not get job information for the given job_id', error));
+            } else if (result[0]) {
+                // Create the response
                 var response = '{job_id: ' + jobId + ', job_type: ' + result[0].jobType + ', start_time: ' +
                     result[0].startTime + ', end_time: ' + result[0].endTime + ', map_progress: ' +
                     result[0].mapProgress + ', reduce_progress: ' + result[0].reduceProgress + '}';
                 console.log("Response: " + response);
 
-                // return the response
+                // Return the response
                 reply(response);
+            } else {
+                reply(boom.badRequest('The given job_id=' + jobId + ' does not exist'));
             } // if else
         });
     } // handler
@@ -139,18 +138,26 @@ server.route({
 
 server.route({
     method: 'DELETE',
-    path: '/tidoop/v1/jobs/{jobId?}',
+    path: '/tidoop/v1/jobs/{jobId}',
     handler: function(request, reply) {
         console.log('Request: DELETE /tidoop/v1/jobs/' + request.params.jobId + '/');
-        throw new Error('Unsupported operation');
+        reply(boom.notImplemented('Unsupported operation'));
     } // handler
 });
 
-// start the server
-server.start(function(error) {
-    if(error) {
-        return console.log("Some error occurred during the starting of the Hapi server. Details: " + error);
-    } // if
+// Create a connection to the MySQL server, and start the Hapi server
+mysqlDriver.connect(function(error) {
+    if (error) {
+        console.log('There was some error when connecting to MySQL database. The server will not be run. ' +
+            'Details: ' + error);
+    } else {
+        // Start the Hapi server
+        server.start(function(error) {
+            if(error) {
+                return console.log("Some error occurred during the starting of the Hapi server. Details: " + error);
+            } // if
 
-    console.log("tidoop-mr-lib-api running at http://localhost:" + port);
+            console.log("tidoop-mr-lib-api running at http://localhost:" + config.port);
+        });
+    } // if else
 });

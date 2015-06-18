@@ -18,36 +18,38 @@
  */
 
 /**
- * Http server for "Tidoop MR job library" REST API
+ * Utils for the Http server.
  *
  * Author: frb
  */
 
+function getMRJobByType(jobType) {
+    if (jobType === 'filter') {
+        return 'com.telefonica.iot.tidoop.mrlib.Filter';
+    } else if (jobType === 'map_only') {
+        return 'com.telefonica.iot.tidoop.mrlib.MapOnly';
+    } else {
+        return null;
+    } // if else
+} // getMRJobType
+
+function getParamsForMRJob(jobType, payload) {
+    var params = [];
+
+    if (jobType === 'filter') {
+        params.push(payload.input);
+        params.push(payload.output);
+        params.push(payload.regex);
+    } else if (jobType === 'map_only') {
+        params.push(payload.input);
+        params.push(payload.output);
+        params.push(payload.map_function);
+    } // if else
+
+    return params;
+} // getParamsForMRJob
+
 module.exports = {
-    getMRJobByType: function (jobType) {
-        if (jobType === 'filter') {
-            return 'com.telefonica.iot.tidoop.mrlib.Filter';
-        } else if (jobType === 'map_only') {
-            return 'com.telefonica.iot.tidoop.mrlib.MapOnly';
-        } else {
-            return null;
-        } // if else
-    }, // getMRJobType
-
-    getParamsForMRJob: function (jobType, payload) {
-        var params = [];
-
-        if (jobType === 'filter') {
-            params.push(payload.input);
-            params.push(payload.output);
-            params.push(payload.regex);
-        } else if (jobType === 'map_only') {
-            params.push(payload.input);
-            params.push(payload.output);
-            params.push(payload.map_function);
-        } // if else
-
-        return params;
-    } // getParamsForMRJob
-
-}
+    getMRJobByType: getMRJobByType,
+    getParamsForMRJob: getParamsForMRJob
+} // modeule.exports
