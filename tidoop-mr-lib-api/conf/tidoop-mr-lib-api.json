@@ -1,3 +1,11 @@
 {
-  "port": 6060
+  "port": 6060,
+  "tidoopMRLibPath": "path/to/tidoop-mr-lib",
+  "mysql": {
+    "host": "",
+    "port": 3306,
+    "user": "",
+    "password": "",
+    "database": "cosmos_gui"
+  }
 }

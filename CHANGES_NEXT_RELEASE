@@ -2,3 +2,4 @@
 - [tidoop-hadoop-ext] [FEATURE] Hadoop extensions for CKAN (write mode) (#6)
 - [tidoop-mr-lib] [FEATURE] Add Filter MR job (#15)
 - [tidoop-mr-lib] [FEATURE] ADD MapOnly MR job (#17)
+- [tidoop-mr-lib-api] [FEATURE] Add REST API method for Filter MR job (#22)
