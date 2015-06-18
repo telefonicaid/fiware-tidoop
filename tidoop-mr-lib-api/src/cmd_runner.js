@@ -49,15 +49,13 @@ function run(jobId, cmd, params, callback) {
             mysqlDriver.updateJobStatus(jobId, mapProgress, reduceProgress, function (error, result) {
                 if (error) {
                     callback(error);
-                } else {
-                    callback(null, result);
-                } // if else
+                }
             });
         } // if
     });
 
     job.on('close', function (code) {
-        return callback(result);
+        return callback(null, result);
     });
 } // run
 
