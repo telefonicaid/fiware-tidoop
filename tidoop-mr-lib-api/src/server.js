@@ -88,8 +88,12 @@ server.route({
                     serverUtils.getMRJobByType(jobType),
                     '-libjars', config.tidoopMRLibPath].concat(
                         serverUtils.getParamsForMRJob(jobType, request.payload)),
-                    function(result) {
-                        console.log(result);
+                    function(error, result) {
+                        if (error) {
+                            reply(boom.internal('The MR job could not be run', error));
+                        } else {
+                            console.log(result);
+                        } // if else
                     }
                 );
 
