@@ -3,3 +3,4 @@
 - [tidoop-mr-lib] [FEATURE] Add Filter MR job (#15)
 - [tidoop-mr-lib] [FEATURE] ADD MapOnly MR job (#17)
 - [tidoop-mr-lib-api] [FEATURE] Add REST API method for Filter MR job (#22)
+- [tidoop-mr-lib-api] [FEATURE] Add REST API method for MapOnly MR job (#25)
