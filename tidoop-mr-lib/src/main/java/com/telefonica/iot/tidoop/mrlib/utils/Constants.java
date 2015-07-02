@@ -33,5 +33,6 @@ public final class Constants {
     
     public static final String PARAM_REGEX = "param_regex";
     public static final String PARAM_FUNCTION = "param_function";
+    public static final String PARAM_SEPARATOR_VALUE = "param_separator_value";
     
 } // Constants
