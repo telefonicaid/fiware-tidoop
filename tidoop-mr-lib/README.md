@@ -19,6 +19,7 @@
     * [Chaining of jobs](#chaining)
 * [Jobs reference (in alphabetical order)](#jobs)
     * [Filter](#filter)
+    * [PlainJSONToCSV](#plainjsontocsv)
     * [MapOnly](#maponly)
 * [Contact](#contact)
 
@@ -205,6 +206,39 @@ To be done
 [Top](#top)
 
 ##<a name="jobs"></a>Jobs reference (in alphabetical order)
+###<a name="plainjsontocsv"></a>PlainJSONToCSV
+This job translates a plain JSON file (this is, a file made of documents whose element's values are basic ones, not arrays nor other JSON object) into a Comma-Separated Value (CSV) file. For instance, assuming a file wihtin the input folder containing this data:
+
+    {"customer_id":"9872","customer_type":"vip","num_purchases":345,"num_returns":0,"double_check":"false","discount":0.05}
+    {"customer_id":"19902","customer_type":"normal","num_purchases":3,"num_returns":2,"double_check":"true"}
+    {"customer_id":"13001","customer_type":"normal","num_purchases":61,"num_returns":1,"double_check":"false"}
+
+If a field separator `,` is used, then the output file would be as:
+
+    9872,vip,345,0,false,0.05
+    19902,normal,3,2,true
+    13001,normal,61,1,false
+    
+Arguments:
+
+* **Input folder**: a HDFS folder containing the input data in the form of one or more files.
+* **Output folder**: a HDFS folder containing the output data in the form of one or more files.
+* **Separator value**: despite of its name (*comma*-separated value), a separator different than the comma may be defined.
+
+Usage:
+
+    $ hadoop jar \
+         target/tidoop-mr-lib-x.y.z-jar-with-dependencies.jar \
+         com.telefonica.iot.tidoop.mrlib.PlainJSONToCSV \
+         -libjars target/tidoop-mr-lib-x.y.z-jar-with-dependencies.jar \
+         <input_folder> \
+         <output_folder> \
+         <separator_value>
+         
+Categories: **transformation**, **generic**, **flat**.
+
+[Top](#top)
+
 ###<a name="filter"></a>Filter
 Use this job in order to filter lines within input data based on a regular expression. If the regular expression matches, then the line is maintained in the output data. For instance, assuming a file within the input folder containing this data:
 
@@ -212,7 +246,7 @@ Use this job in order to filter lines within input data based on a regular expre
     this is not real data
     but it is useful for demostration purposes
     
-If a regular expression such as `^.*\bdata\b.*$` was used, then the output file would be:
+If a regular expression such as `^.*\bdata\b.*$` was used, then the output file would be as:
 
     these are some lines of data
     this is not real data
@@ -229,8 +263,8 @@ Usage:
          target/tidoop-mr-lib-x.y.z-jar-with-dependencies.jar \
          com.telefonica.iot.tidoop.mrlib.Filter \
          -libjars target/tidoop-mr-lib-x.y.z-jar-with-dependencies.jar \
-         <input folder> \
-         <output folder> \
+         <input_folder> \
+         <output_folder> \
          <regex>
          
 Categories: **transformation**, **generic**, **flat**.
@@ -246,7 +280,7 @@ Use this job in order to apply a user defined function over all the input data (
     1.2
     410
 
-If a mapping function such as `double y = x * x` was defined (`x` gets the value within each line), then the output file would be:
+If a mapping function such as `double y = x * x` was defined (`x` gets the value within each line), then the output file would be as:
 
     9.0
     144.0
@@ -291,9 +325,9 @@ Usage:
          target/tidoop-mr-lib-x.y.z-jar-with-dependencies.jar \
          com.telefonica.iot.tidoop.mrlib.MapOnly \
          -libjars target/tidoop-mr-lib-x.y.z-jar-with-dependencies.jar \
-         <input folder> \
-         <output folder> \
-         <map function>
+         <input_folder> \
+         <output_folder> \
+         <map_function>
          
 Categories: **transformation**, **generic**, **flat**.
 
