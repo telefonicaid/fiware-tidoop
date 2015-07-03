@@ -312,6 +312,14 @@ If a field separator `,` is used, then the output file would be as:
     9872,vip,345,0,false,0.05
     19902,normal,3,2,true
     13001,normal,61,1,false
+
+In fact, the original JSON may have values not being of a basic type; they are simply ignored, for instance:
+
+    {"customer_id":"19902","customer_type":"normal","num_purchases":3,"num_returns":2,"double_check":"true","item_references":["4567-F","980001-YT","99104-AA"]}
+    
+Is translated again into:
+
+    19902,normal,3,2,true
     
 Arguments:
 
