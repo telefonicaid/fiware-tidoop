@@ -33,6 +33,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -66,10 +67,18 @@ public class PlainJSONToCSV extends Configured implements Tool {
                 Iterator it = o.keySet().iterator();
                 
                 if (it.hasNext()) {
-                    csvLine += (String) o.get((String) it.next());
+                    Object item = o.get((String) it.next());
+                    
+                    if (!(item instanceof JSONArray) && !(item instanceof JSONObject)) {
+                        csvLine += (String) item;
+                    } // if
                     
                     while (it.hasNext()) {
-                        csvLine += separatorValue + (String) o.get((String) it.next());
+                        item = o.get((String) it.next());
+                        
+                        if (!(item instanceof JSONArray) && !(item instanceof JSONObject)) {
+                            csvLine += separatorValue + (String) item;
+                        } // if
                     } // while
                 } // if
 
@@ -139,7 +148,7 @@ public class PlainJSONToCSV extends Configured implements Tool {
         // create and configure a MapReduce job
         Configuration conf = this.getConf();
         conf.set(Constants.PARAM_SEPARATOR_VALUE, separatorValue);
-        Job job = Job.getInstance(conf, "tidoop-mr-lib-ngsitocsv");
+        Job job = Job.getInstance(conf, "tidoop-mr-lib-plainjsontocsv");
         job.setNumReduceTasks(1);
         job.setJarByClass(PlainJSONToCSV.class);
         job.setMapperClass(LineConverter.class);
