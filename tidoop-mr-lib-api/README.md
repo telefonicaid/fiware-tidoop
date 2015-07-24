@@ -5,6 +5,7 @@
     * [Prerequisites](#prerequisites)
     * [Installation](#installation)
     * [Unit tests](#unittests)
+* [Configuration](#configuration)
 * [Running](#running)
 * [Usage](#usage)
 * [Contact](#contact)
@@ -47,6 +48,20 @@ To be done.
 
 [Top](#top)
 
+##<a name="configuration"></a>Configuration
+tioop-mr-lib-api is configured through a JSON file (`conf/tidoop-mr-lib-api.json`). These are the available parameters:
+
+* **port**: TCP listening port for incomming API methods invocation. 12000 by default.
+* **tidoopMRLibPath**: Installation path for tidoop-mr-lib.
+* **mysql**:
+    * **host**: FQDN or IP address of the host running the service.
+    * **port**: TCP listening port for the MySQL service, typically 3306.
+    * **user**: A valid user allowed to write and red the MySQL database.
+    * **password**: Password for above user.
+    * **database**: Database where write and read information regarding the launched MR jobs.
+
+[Top](#top)
+
 ##<a name="running"></a>Running
 The Http server implemented by tidoop-mr-lib-api is run as (assuming your current directory is `fiware-tidoop/tidoop-mr-lib-api`):
 
@@ -54,10 +69,10 @@ The Http server implemented by tidoop-mr-lib-api is run as (assuming your curren
     
 If everything goes well, you should be able to remotely ask (using a web browser or `curl` tool) for the version of the software:
 
-    $ curl -X GET "http://<host_running_the_api>:6060/version"
+    $ curl -X GET "http://<host_running_the_api>:12000/version"
     {version: 0.0.0}
     
-tidoop-mr-lib-api typically listens in the TCP/6060 port, but you can change if by editing `conf/tidoop-mr-lib-api.conf`.
+tidoop-mr-lib-api typically listens in the TCP/12000 port, but you can change if by editing `conf/tidoop-mr-lib-api.conf` as seen above.
 
 [Top](#top)
 
