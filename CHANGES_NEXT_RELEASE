@@ -5,3 +5,6 @@
 - [tidoop-mr-lib-api] [FEATURE] Add REST API method for Filter MR job (#22)
 - [tidoop-mr-lib-api] [FEATURE] Add REST API method for MapOnly MR job (#25)
 - [tidoop-mr-lib-api] [HARDENING] Add detailed information about reporting issues and contact information (#27)
+- [tidoop-mr-lib-api] [HARDENING] Add a configuration section in the README (#36)
+- [tidoop-mr-lib-api] [HARDENING] Document MySQL as prerequisite and how databases and tables are created (#40)
+- [tidoop-mr-lib] [HARDENING] Add reference to tidoop-mr-lib-api in the usage section of the README (#41)
