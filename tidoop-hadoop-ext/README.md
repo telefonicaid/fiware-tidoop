@@ -5,6 +5,7 @@
     * [Prerequisites](#section2.1)
     * [Building tidoop-hadoop-ext and its dependencies](#section2.2)
     * [Unit tests](#section2.3)
+* [Installation](#installation)
 * [Usage](#section3)
     * [CKAN extensions](#section3.1)
         * [Introducing `CKANMapReduceExample`](#section3.1.1)
@@ -143,6 +144,11 @@ Tests run: 24, Failures: 0, Errors: 0, Skipped: 0
 ```
 
 [Top](#section0)
+
+##<a name="install"></a>Installation
+You can directly use the built `tidoop-hadoop-ext-x.y.z-jar-with-dependencies.jar` / `tidoop-hadoop-ext-x.y.z.jar` file (depending on wether you pack the dependencies or not, respectively) under the `target` directory, or you can copy the jar file somewhere in the Java classpath.
+
+[Top](#installation)
 
 ##<a name="section3"></a>Usage
 
