@@ -162,7 +162,9 @@ To be done
 [Top](#top)
 
 ###<a name="mrlibapi"></a>Using tidoop-mr-lib-api
-To be done
+There exists a parallel project to tidoop-mr-lib, named tidoop-mr-lib-api, in charge of exposing a REST-based method for running each MapReduce job within this library.
+
+Please refer to the [usage](../tidoop-mr-lib-api/README.md#usage) section in the README of tidoop-mr-lib-api at Github.
 
 [Top](#top)
 
