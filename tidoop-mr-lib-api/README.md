@@ -3,7 +3,8 @@
 * [What is tidoop-mr-lib-api](#whatis)
 * [Installation](#maininstall)
     * [Prerequisites](#prerequisites)
-    * [Installation](#installation)
+    * [API installation](#apiinstallation)
+    * [MySQL database installation](#mysqlinstallation)
     * [Unit tests](#unittests)
 * [Running](#running)
 * [Usage](#usage)
@@ -24,11 +25,13 @@ This REST API has no sense if tidoop-mr-lib is not installed. And tidoop-mr-lib 
 
 As said, tidoop-mr-lib-api is a Node.js application, therefore install it from the official [download](https://nodejs.org/download/). An advanced alternative is to install [Node Version Manager](https://github.com/creationix/nvm) (nvm) by creationix/Tim Caswell, whcih will allow you to have several versions of Node.js and switch among them.
 
+Launched MapReduce jobs are tracked by means of a MySQL database, thus a MySQL server must be installed somewhere of your choice and be accessible by the API.
+
 Of course, common tools such as `git` and `curl` are needed.
 
 [Top](#top)
 
-###<a name="installation"></a>Installation
+###<a name="apiinstallation"></a>API installation
 Start by cloning the Tidoop repository somewhere of your ownership:
 
     $ git clone https://github.com/telefonicaid/fiware-tidoop.git
@@ -39,6 +42,22 @@ tidoop-mr-lib-api code is located at `fiware-tidoop/tidoop-mr-lib-api`. Change t
     $ npm install
     
 That must download all the dependencies under a `node_modules` directory.
+
+[Top](#top)
+
+###<a name="mysqlinstallation"></a>MySQL database installation
+Use the file `resources/mysql_db_and_tables.sql` for creating both `cosmos` database (if not yet existing) and `tidoop_job` table.
+
+    $ mysql -u <mysql_user> -p < resources/mysql_db_and_tables.sql
+
+The `tidoop_job` table tracks, for each MapReduce job:
+
+* The job id, with format `tidoop_job_<timestamp>`.
+* The job type, e.g. `map_only` or `filter`.
+* The timestamp when the job was launched.
+* The timestamp when the job finished.
+* The mapping progress, in percentage.
+* The reducing progress, in percentage.
 
 [Top](#top)
 
