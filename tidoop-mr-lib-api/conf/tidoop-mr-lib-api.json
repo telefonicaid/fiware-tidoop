@@ -1,4 +1,5 @@
 {
+  "host": "localhost",
   "port": 12000,
   "tidoopMRLibPath": "path/to/tidoop-mr-lib",
   "mysql": {
