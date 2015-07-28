@@ -77,7 +77,7 @@ tioop-mr-lib-api is configured through a JSON file (`conf/tidoop-mr-lib-api.json
     * **port**: TCP listening port for the MySQL service, typically 3306.
     * **user**: A valid user allowed to write and read the MySQL database.
     * **password**: Password for above user.
-    * **database**: Database used to track information regarding the launched MR jobs.
+    * **database**: Database used to track information regarding the launched MR jobs; "cosmos" by default.
 
 [Top](#top)
 
