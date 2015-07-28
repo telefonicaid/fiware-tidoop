@@ -36,7 +36,7 @@ var serverUtils = require('./server_utils.js');
 var server = new Hapi.Server();
 
 server.connection({ 
-    host: 'localhost',
+    host: config.host,
     port: config.port
 });
 
