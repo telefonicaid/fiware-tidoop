@@ -161,7 +161,7 @@ mysqlDriver.connect(function(error) {
                 return console.log("Some error occurred during the starting of the Hapi server. Details: " + error);
             } // if
 
-            console.log("tidoop-mr-lib-api running at http://localhost:" + config.port);
+            console.log("tidoop-mr-lib-api running at http://" + config.host + ":" + config.port);
         });
     } // if else
 });
