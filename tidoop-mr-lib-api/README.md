@@ -70,6 +70,7 @@ To be done.
 ##<a name="configuration"></a>Configuration
 tioop-mr-lib-api is configured through a JSON file (`conf/tidoop-mr-lib-api.json`). These are the available parameters:
 
+* **host**: FQDN or IP address of the host running the service. Do not use `localhost` unless you want only local clients may access the service.
 * **port**: TCP listening port for incomming API methods invocation. 12000 by default.
 * **tidoopMRLibPath**: Installation path for tidoop-mr-lib.
 * **mysql**:
