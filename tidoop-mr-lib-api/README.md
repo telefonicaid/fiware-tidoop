@@ -89,7 +89,7 @@ The Http server implemented by tidoop-mr-lib-api is run as (assuming your curren
     
 If everything goes well, you should be able to remotely ask (using a web browser or `curl` tool) for the version of the software:
 
-    $ curl -X GET "http://<host_running_the_api>:12000/version"
+    $ curl -X GET "http://<host_running_the_api>:12000/tidoop/v1/version"
     {version: 0.0.0}
     
 tidoop-mr-lib-api typically listens in the TCP/12000 port, but you can change if by editing `conf/tidoop-mr-lib-api.conf` as seen above.
