@@ -16,9 +16,9 @@
  * For those usages not covered by the GNU Affero General Public License please contact with
  * francisco.romerobueno at telefonica dot com
  */
-package com.telefonica.iot.tidoop.mrlib;
+package com.telefonica.iot.tidoop.mrlib.jobs;
 
-import com.telefonica.iot.tidoop.mrlib.MapOnly.CustomMapper;
+import com.telefonica.iot.tidoop.mrlib.jobs.MapOnly.CustomMapper;
 import com.telefonica.iot.tidoop.mrlib.utils.Constants;
 import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;

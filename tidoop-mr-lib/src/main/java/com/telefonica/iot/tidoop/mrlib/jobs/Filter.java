@@ -16,8 +16,10 @@
  * For those usages not covered by the GNU Affero General Public License please contact with
  * francisco.romerobueno at telefonica dot com
  */
-package com.telefonica.iot.tidoop.mrlib;
+package com.telefonica.iot.tidoop.mrlib.jobs;
 
+import com.telefonica.iot.tidoop.mrlib.combiners.LinesCombiner;
+import com.telefonica.iot.tidoop.mrlib.reducers.LinesJoiner;
 import com.telefonica.iot.tidoop.mrlib.utils.Constants;
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -29,7 +31,6 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
@@ -65,38 +66,6 @@ public final class Filter extends Configured implements Tool {
         } // map
         
     } // LineFilter
-    
-    /**
-     * Combiner class. It implements the same code than the reducer class, except for the emitted (k,v) pair: in the
-     * reducer the emitted pair is about (NullWritable,Text) but the combiner must emit the pairs as if they were
-     * emitted by the mapper, thus is about emitting (Text,Text) pairs.
-     */
-    public static class LinesCombiner extends Reducer<Text, Text, Text, Text> {
-        
-        @Override
-        public void reduce(Text key, Iterable<Text> filteredLines, Context context)
-            throws IOException, InterruptedException {
-            for (Text filteredLine : filteredLines) {
-                context.write(key, filteredLine);
-            } // for
-        } // reduce
-        
-    } // LinesCombiner
-
-    /**
-     * Reducer class.
-     */
-    public static class LinesJoiner extends Reducer<Text, Text, NullWritable, Text> {
-
-        @Override
-        public void reduce(Text key, Iterable<Text> filteredLines, Context context)
-            throws IOException, InterruptedException {
-            for (Text filteredLine : filteredLines) {
-                context.write(NullWritable.get(), filteredLine);
-            } // for
-        } // reduce
-        
-    } // LinesJoiner
 
     /**
      * Main class.

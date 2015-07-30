@@ -16,11 +16,11 @@
  * For those usages not covered by the GNU Affero General Public License please contact with
  * francisco.romerobueno at telefonica dot com
  */
-package com.telefonica.iot.tidoop.mrlib;
+package com.telefonica.iot.tidoop.mrlib.jobs;
 
-import com.telefonica.iot.tidoop.mrlib.Filter.LineFilter;
-import com.telefonica.iot.tidoop.mrlib.Filter.LinesCombiner;
-import com.telefonica.iot.tidoop.mrlib.Filter.LinesJoiner;
+import com.telefonica.iot.tidoop.mrlib.combiners.LinesCombiner;
+import com.telefonica.iot.tidoop.mrlib.jobs.Filter.LineFilter;
+import com.telefonica.iot.tidoop.mrlib.reducers.LinesJoiner;
 import com.telefonica.iot.tidoop.mrlib.utils.Constants;
 import java.io.IOException;
 import java.util.ArrayList;

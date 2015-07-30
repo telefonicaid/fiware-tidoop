@@ -16,7 +16,7 @@
  * For those usages not covered by the GNU Affero General Public License please contact with
  * francisco.romerobueno at telefonica dot com
  */
-package com.telefonica.iot.tidoop.mrlib;
+package com.telefonica.iot.tidoop.mrlib.jobs;
 
 import bsh.EvalError;
 import bsh.Interpreter;
