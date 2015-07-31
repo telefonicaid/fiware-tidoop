@@ -80,6 +80,7 @@ server.route({
         // Create a new job entry in the database
         mysqlDriver.addJob(jobId, jobType, function(error, result) {
             if (error) {
+                logger.error('The new job could not be added to the database');
                 reply(boom.internal('The new job could not be added to the database', error));
             } else {
                 // Run the Filter MR job; the callback function will receive the complete output once it finishes
@@ -91,6 +92,7 @@ server.route({
                         serverUtils.getParamsForMRJob(jobType, request.payload)),
                     function(error, result) {
                         if (error) {
+                            logger.error('The MR job could not be run');
                             reply(boom.internal('The MR job could not be run', error));
                         } else {
                             logger.info(result);
@@ -124,6 +126,7 @@ server.route({
         // Get the job status
         var result = mysqlDriver.getJob(jobId, function (error, result) {
             if (error) {
+                logger.error('Could not get job information for the given job_id');
                 reply(boom.internal('Could not get job information for the given job_id', error));
             } else if (result[0]) {
                 // Create the response
