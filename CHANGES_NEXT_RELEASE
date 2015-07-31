@@ -12,3 +12,4 @@
 - [tidoop-mr-lib-api] [HARDENING] Set 12000 as default port and "cosmos" as the database name in the configuration (#45)
 - [tidoop-mr-lib-api] [HARDENING] Add a host configuration parameter (#47)
 - [tidoop-mr-lib-api] [HARDENING] Fix the GET version method in the README (#29)
+- [tidoop-mr-lib] [HARDENING] Refactor the package names (#32)

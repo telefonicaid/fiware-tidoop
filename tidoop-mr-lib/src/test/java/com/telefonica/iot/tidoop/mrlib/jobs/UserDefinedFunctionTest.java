@@ -16,8 +16,9 @@
  * For those usages not covered by the GNU Affero General Public License please contact with
  * francisco.romerobueno at telefonica dot com
  */
-package com.telefonica.iot.tidoop.mrlib;
+package com.telefonica.iot.tidoop.mrlib.jobs;
 
+import com.telefonica.iot.tidoop.mrlib.jobs.UserDefinedFunction;
 import com.telefonica.iot.tidoop.mrlib.io.NumericType;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
