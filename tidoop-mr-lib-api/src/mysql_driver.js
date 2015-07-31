@@ -26,6 +26,7 @@
 // Module dependencies
 var mysql = require('mysql');
 var mysqlConfig = require('../conf/tidoop-mr-lib-api.json').mysql;
+var logger = require('./logger.js');
 
 var connection = mysql.createConnection({
     host: mysqlConfig.host,
@@ -40,7 +41,7 @@ function connect(callback) {
         if (error) {
             callback(error);
         } else {
-            console.log('Connected to http://' + mysqlConfig.host + ':' + mysqlConfig.port + '/' +
+            logger.info('Connected to http://' + mysqlConfig.host + ':' + mysqlConfig.port + '/' +
                 mysqlConfig.database);
             callback(null);
         } // if else
@@ -56,7 +57,7 @@ function addJob(jobId, jobType, callback) {
             if (error) {
                 callback(error)
             } else {
-                console.log('Successful insert: \'INSERT INTO tidoop_job ' +
+                logger.info('Successful insert: \'INSERT INTO tidoop_job ' +
                     '(jobId, jobType, startTime, mapProgress, reduceProgress) VALUES' +
                     '(' + jobId + ', ' + jobType + ', NOW(), 0, 0)\'');
                 callback(null, result);
@@ -74,7 +75,7 @@ function updateJobStatus(jobId, mapProgress, reduceProgress, callback) {
                 if (error) {
                     callback(error);
                 } else {
-                    console.log('Successful update: \'UPDATE tidoop_job ' +
+                    logger.info('Successful update: \'UPDATE tidoop_job ' +
                         'SET endTime=NOW(), mapProgress=' + mapProgress + ', reduceProgress=' +
                         reduceProgress + ' WHERE jobId=\'' + jobId + '\'\'');
                     callback(null, result);
@@ -89,7 +90,7 @@ function updateJobStatus(jobId, mapProgress, reduceProgress, callback) {
                 if (error) {
                     callback(error);
                 } else {
-                    console.log('Successful update: \'UPDATE tidoop_job ' +
+                    logger.info('Successful update: \'UPDATE tidoop_job ' +
                         'SET mapProgress=' + mapProgress + ', reduceProgress=' + reduceProgress +
                         ' WHERE jobId=\'' + jobId + '\'\'');
                     callback(null, result);
@@ -106,7 +107,7 @@ function getJob(jobId, callback) {
             if (error) {
                 callback(error);
             } else {
-                console.log('Successful select: \'SELECT * from tidoop_job WHERE jobId=\'' + jobId + '\'\'');
+                logger.info('Successful select: \'SELECT * from tidoop_job WHERE jobId=\'' + jobId + '\'\'');
                 callback(null, result);
             } // if else
         }
