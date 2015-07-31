@@ -8,5 +8,9 @@
     "user": "",
     "password": "",
     "database": "cosmos"
+  },
+  "log": {
+    "file_name": "/var/log/tidoop/tidoop-mr-lib-api/tidoop-mr-lib-api.log",
+    "date_pattern": ".dd-MM-yyyy"
   }
 }
