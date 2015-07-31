@@ -14,3 +14,4 @@
 - [tidoop-mr-lib-api] [HARDENING] Fix the GET version method in the README (#29)
 - [tidoop-mr-lib] [HARDENING] Refactor the package names (#32)
 - [tidoop-mr-lib-api] [HARDENING] Add logging facilities (#38)
+- [tidoop-mr-lib-api] [HARDENING] Add an administration section in the README (#37)
