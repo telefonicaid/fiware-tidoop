@@ -15,3 +15,4 @@
 - [tidoop-mr-lib] [HARDENING] Refactor the package names (#32)
 - [tidoop-mr-lib-api] [HARDENING] Add logging facilities (#38)
 - [tidoop-mr-lib-api] [HARDENING] Add an administration section in the README (#37)
+- [tidoop] [HARDENING] Add references to FIWARE and Cosmos Big Data Analysis GE in the README (#55)
