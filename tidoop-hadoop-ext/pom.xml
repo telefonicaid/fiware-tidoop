@@ -4,7 +4,7 @@
 
   <groupId>com.telefonica.iot.tidoop</groupId>
   <artifactId>tidoop-api-ext</artifactId>
-  <version>0.1.0</version>
+  <version>0.1.0_SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>tidoop-api-ext</name>
