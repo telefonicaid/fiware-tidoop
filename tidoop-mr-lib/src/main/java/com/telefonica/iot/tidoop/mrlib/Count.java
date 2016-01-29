@@ -32,12 +32,15 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author frb
  */
 public class Count extends Configured implements Tool {
+    
+    private static final Logger LOGGER = Logger.getLogger(Count.class);
     
     /**
      * Mapper class.
@@ -63,9 +66,13 @@ public class Count extends Configured implements Tool {
         @Override
         public void reduce(Text key, Iterable<LongWritable> values, Context context)
             throws IOException, InterruptedException {
+            long sum = 0;
+            
             for (LongWritable value : values) {
-                context.write(key, value);
+                sum += value.get();
             } // for
+            
+            context.write(key, new LongWritable(sum));
         } // reduce
         
     } // Adder
@@ -85,9 +92,13 @@ public class Count extends Configured implements Tool {
         @Override
         public void reduce(Text key, Iterable<LongWritable> values, Context context)
             throws IOException, InterruptedException {
+            long sum = 0;
+            
             for (LongWritable value : values) {
-                context.write(tag == null || tag.length() == 0 ? null : new Text(tag), value);
+                sum += value.get();
             } // for
+            
+            context.write(tag == null || tag.length() == 0 ? null : new Text(tag), new LongWritable(sum));
         } // reduce
         
     } // AdderWithTag
