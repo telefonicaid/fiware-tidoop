@@ -1,0 +1,16 @@
+{
+  "host": "localhost",
+  "port": 12000,
+  "tidoopMRLibPath": "path/to/tidoop-mr-lib",
+  "mysql": {
+    "host": "",
+    "port": 3306,
+    "user": "",
+    "password": "",
+    "database": "cosmos"
+  },
+  "log": {
+    "file_name": "/var/log/tidoop/tidoop-mr-lib-api/tidoop-mr-lib-api.log",
+    "date_pattern": ".dd-MM-yyyy"
+  }
+}

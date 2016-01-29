@@ -1,0 +1,18 @@
+{
+  "name": "tidoop-mr-lib-api",
+  "description": "Node.js app exposing the Tidoop MR job library REST API",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/telefonicaid/fiware-tidoop.git"
+  },
+  "dependencies": {
+    "hapi": "^8.5.1",
+    "mysql": "^2.7.0",
+    "boom": "^2.8.0",
+    "winston": "^1.0.1"
+  },
+  "scripts": {
+    "start": "node ./src/server.js"
+  }
+}
