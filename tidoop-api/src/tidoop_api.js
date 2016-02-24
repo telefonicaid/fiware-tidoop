@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Telefonica Investigación y Desarrollo, S.A.U
+ * Copyright 2016 Telefonica Investigación y Desarrollo, S.A.U
  *
  * This file is part of fiware-tidoop (FI-WARE project).
  *
@@ -18,7 +18,7 @@
  */
 
 /**
- * Http server for "Tidoop MR job library" REST API
+ * Http server for Tidoop REST API
  *
  * Author: frb
  */
@@ -55,41 +55,34 @@ server.route({
 
 server.route({
     method: 'GET',
-    path: '/tidoop/v1/jobs/',
+    path: '/tidoop/v1/user/{userId}/jobs',
     handler: function(request, reply) {
-        logger.info('Request: GET /tidoop/v1/jobs/');
+        logger.info('Request: GET /tidoop/v1/user/' + request.params.userId + '/jobs/');
         reply(boom.notImplemented('Unsupported operation'));
     } // handler
 });
 
 server.route({
     method: 'POST',
-    path: '/tidoop/v1/jobs/',
+    path: '/tidoop/v1/user/{userId}/{inputDataPath}',
     handler: function (request, reply) {
-        logger.info('Request: POST /tidoop/v1/jobs/ ' + JSON.stringify(request.payload));
-
-        // Check the request parameters
-        // TBD
-
-        // Get the jobType
-        var jobType = request.payload.job_type;
-
-        // Create a jobId
+        var userId = request.params.userId;
+        var inputData = '/user/' + userId + '/' + request.params.inputDataPath;
+        var jarPath = request.payload.jar_path;
+        var className = request.payload.class_name;
         var jobId = 'tidoop_job_' + Date.now();
+        var outputData = '/user/' + userId + '/jobs/' + jobId + '/output';
+
+        logger.info('Request: POST /tidoop/v1' + inputData + ' ' + JSON.stringify(request.payload));
 
         // Create a new job entry in the database
-        mysqlDriver.addJob(jobId, jobType, function(error, result) {
+        mysqlDriver.addJob(jobId, 'custom', function(error, result) {
             if (error) {
                 logger.error('The new job could not be added to the database');
                 reply(boom.internal('The new job could not be added to the database', error));
             } else {
-                // Run the Filter MR job; the callback function will receive the complete output once it finishes
-                cmdRunner.run(jobId,
-                    'hadoop',
-                    ['jar', config.tidoopMRLibPath,
-                    serverUtils.getMRJobByType(jobType),
-                    '-libjars', config.tidoopMRLibPath].concat(
-                        serverUtils.getParamsForMRJob(jobType, request.payload)),
+                // Run the job; the callback function will receive the complete output once it finishes
+                cmdRunner.run(jobId, 'hadoop', ['jar', jarPath, className, '-libjars', jarPath, inputData, outputData]),
                     function(error, result) {
                         if (error) {
                             logger.error('The MR job could not be run');
@@ -113,15 +106,12 @@ server.route({
 
 server.route({
     method: 'GET',
-    path: '/tidoop/v1/jobs/{jobId}',
+    path: '/tidoop/v1/user/{userId}/jobs/{jobId}',
     handler: function (request, reply) {
-        logger.info('Request: GET /tidoop/v1/jobs/' + request.params.jobId + '/');
-
-        // Check the request parameters
-        // TBD
-
-        // Get the jobId
+        var userId = request.params.userId;
         var jobId = request.params.jobId;
+
+        logger.info('Request: GET /tidoop/v1/user/' + userId + '/jobs/' + jobId);
 
         // Get the job status
         var result = mysqlDriver.getJob(jobId, function (error, result) {
@@ -146,9 +136,13 @@ server.route({
 
 server.route({
     method: 'DELETE',
-    path: '/tidoop/v1/jobs/{jobId}',
+    path: '/tidoop/v1/user/{userId}/jobs/{jobId}',
     handler: function(request, reply) {
-        logger.info('Request: DELETE /tidoop/v1/jobs/' + request.params.jobId + '/');
+        var userId = request.params.userId;
+        var jobId = request.params.jobId;
+
+        logger.info('Request: DELETE /tidoop/v1/user/' + userId + '/jobs/' + jobId);
+
         reply(boom.notImplemented('Unsupported operation'));
     } // handler
 });
