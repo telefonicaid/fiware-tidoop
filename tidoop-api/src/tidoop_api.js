@@ -47,7 +47,7 @@ server.route({
     path: '/tidoop/v1/version',
     handler: function (request, reply) {
         logger.info("Request: GET /tidoop/v1/version");
-        var response = '{version: ' + packageJson.version + '}';
+        var response = '{"version": "' + packageJson.version + '"}';
         logger.info("Response: " + response);
         reply(response);
     } // handler
@@ -82,7 +82,7 @@ server.route({
                 reply(boom.internal('The new job could not be added to the database', error));
             } else {
                 // Run the job; the callback function will receive the complete output once it finishes
-                cmdRunner.run(jobId, 'hadoop', ['jar', jarPath, className, '-libjars', jarPath, inputData, outputData]),
+                cmdRunner.run(jobId, 'hadoop', ['jar', jarPath, className, '-libjars', jarPath, inputData, outputData],
                     function(error, result) {
                         if (error) {
                             logger.error('The MR job could not be run');
@@ -120,9 +120,9 @@ server.route({
                 reply(boom.internal('Could not get job information for the given job_id', error));
             } else if (result[0]) {
                 // Create the response
-                var response = '{job_id: ' + jobId + ', job_type: ' + result[0].jobType + ', start_time: ' +
-                    result[0].startTime + ', end_time: ' + result[0].endTime + ', map_progress: ' +
-                    result[0].mapProgress + ', reduce_progress: ' + result[0].reduceProgress + '}';
+                var response = '{"job_id": "' + jobId + '", "job_type": "' + result[0].jobType + '", "start_time": "' +
+                    result[0].startTime + '", "end_time": "' + result[0].endTime + '", "map_progress": ' +
+                    result[0].mapProgress + ', "reduce_progress": ' + result[0].reduceProgress + '}';
                 logger.info("Response: " + response);
 
                 // Return the response
