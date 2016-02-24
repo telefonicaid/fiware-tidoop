@@ -25,7 +25,7 @@
 
 // Module dependencies
 var mysql = require('mysql');
-var mysqlConfig = require('../conf/tidoop-mr-lib-api.json').mysql;
+var mysqlConfig = require('../conf/tidoop-api.json').mysql;
 var logger = require('./logger.js');
 
 var connection = mysql.createConnection({
