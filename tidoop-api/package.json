@@ -1,6 +1,6 @@
 {
-  "name": "tidoop-mr-lib-api",
-  "description": "Node.js app exposing the Tidoop MR job library REST API",
+  "name": "tidoop-api",
+  "description": "Node.js app exposing the Tidoop REST API",
   "version": "0.1.1",
   "repository": {
     "type": "git",
@@ -13,6 +13,6 @@
     "winston": "^1.0.1"
   },
   "scripts": {
-    "start": "node ./src/server.js"
+    "start": "node ./src/tidoop_api.js"
   }
 }
