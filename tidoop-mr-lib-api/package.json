@@ -7,7 +7,7 @@
     "url": "https://github.com/telefonicaid/fiware-tidoop.git"
   },
   "dependencies": {
-    "hapi": "~11.0.0",
+    "hapi": "~11.1.3",
     "mysql": "^2.7.0",
     "boom": "^2.8.0",
     "winston": "^1.0.1"
