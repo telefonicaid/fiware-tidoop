@@ -1,7 +1,7 @@
 #Tidoop
 This project is part of [FIWARE](http://fiware.org), being part of the [Cosmos](http://catalogue.fiware.org/enablers/bigdata-analysis-cosmos) Ecosystem.
 
-Tidoop is the code name for all the developments about [Hadoop](LINK_REQUIRED) made by [FIWARE](LINK_REQUIRED) team at [Telefónica Investigación y Desarrollo](LINK_REQUIRED) (Telefónica Research and Development, in english), or <i>TID</i> in its abreviated form.
+Tidoop is the code name for all the developments about [Hadoop](LINK_REQUIRED) made by [FIWARE](LINK_REQUIRED) team at [Telefónica Investigación y Desarrollo](LINK_REQUIRED) (Telefónica Research and Development, in english), or <i>TID</i> in its abbreviated form.
 
 Tidoop comprises several different projects:
 
